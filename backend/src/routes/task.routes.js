@@ -19,6 +19,8 @@ const {
   handleValidationErrors
 } = require('../middleware/validation.middleware');
 
+const uploadRoutes = require('./upload.routes');
+
 // All routes require authentication
 router.use(protect);
 
@@ -42,5 +44,8 @@ router.route('/:id/comments')
 router.route('/:id/comments/:commentId')
   .put(validateTaskComment, handleValidationErrors, updateComment)
   .delete(deleteComment);
+
+router.use('/:taskId', uploadRoutes);
+
 
 module.exports = router;

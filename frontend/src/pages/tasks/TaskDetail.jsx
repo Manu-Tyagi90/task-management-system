@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   Container,
   Paper,
@@ -24,7 +24,7 @@ import {
   Menu,
   MenuItem,
   Tooltip,
-} from '@mui/material';
+} from "@mui/material";
 import {
   ArrowBack,
   Edit,
@@ -37,26 +37,27 @@ import {
   MoreVert,
   AttachFile,
   Send,
-} from '@mui/icons-material';
-import { useSnackbar } from 'notistack';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import taskService from '../../services/taskService';
+  Download, // Add this
+} from "@mui/icons-material";
+import { useSnackbar } from "notistack";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import taskService from "../../services/taskService";
 
 dayjs.extend(relativeTime);
 
 const priorityColors = {
-  low: 'success',
-  medium: 'warning',
-  high: 'error',
-  urgent: 'error',
+  low: "success",
+  medium: "warning",
+  high: "error",
+  urgent: "error",
 };
 
 const statusColors = {
-  pending: 'default',
-  in_progress: 'primary',
-  completed: 'success',
-  cancelled: 'error',
+  pending: "default",
+  in_progress: "primary",
+  completed: "success",
+  cancelled: "error",
 };
 
 function TaskDetail() {
@@ -67,12 +68,12 @@ function TaskDetail() {
 
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [commentText, setCommentText] = useState('');
+  const [commentText, setCommentText] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
   const [commentMenuAnchor, setCommentMenuAnchor] = useState(null);
   const [selectedComment, setSelectedComment] = useState(null);
   const [editingComment, setEditingComment] = useState(null);
-  const [editCommentText, setEditCommentText] = useState('');
+  const [editCommentText, setEditCommentText] = useState("");
 
   useEffect(() => {
     fetchTask();
@@ -84,22 +85,22 @@ function TaskDetail() {
       const response = await taskService.getTask(id);
       setTask(response.data.task);
     } catch (error) {
-      enqueueSnackbar('Failed to fetch task', { variant: 'error' });
-      navigate('/tasks');
+      enqueueSnackbar("Failed to fetch task", { variant: "error" });
+      navigate("/tasks");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this task?')) return;
+    if (!window.confirm("Are you sure you want to delete this task?")) return;
 
     try {
       await taskService.deleteTask(id);
-      enqueueSnackbar('Task deleted successfully', { variant: 'success' });
-      navigate('/tasks');
+      enqueueSnackbar("Task deleted successfully", { variant: "success" });
+      navigate("/tasks");
     } catch (error) {
-      enqueueSnackbar('Failed to delete task', { variant: 'error' });
+      enqueueSnackbar("Failed to delete task", { variant: "error" });
     }
   };
 
@@ -111,10 +112,10 @@ function TaskDetail() {
       setSubmittingComment(true);
       const response = await taskService.addComment(id, commentText);
       setTask(response.data.task);
-      setCommentText('');
-      enqueueSnackbar('Comment added successfully', { variant: 'success' });
+      setCommentText("");
+      enqueueSnackbar("Comment added successfully", { variant: "success" });
     } catch (error) {
-      enqueueSnackbar('Failed to add comment', { variant: 'error' });
+      enqueueSnackbar("Failed to add comment", { variant: "error" });
     } finally {
       setSubmittingComment(false);
     }
@@ -124,45 +125,66 @@ function TaskDetail() {
     if (!editCommentText.trim()) return;
 
     try {
-      const response = await taskService.updateComment(id, editingComment, editCommentText);
+      const response = await taskService.updateComment(
+        id,
+        editingComment,
+        editCommentText
+      );
       setTask(response.data.task);
       setEditingComment(null);
-      setEditCommentText('');
-      enqueueSnackbar('Comment updated successfully', { variant: 'success' });
+      setEditCommentText("");
+      enqueueSnackbar("Comment updated successfully", { variant: "success" });
     } catch (error) {
-      enqueueSnackbar('Failed to update comment', { variant: 'error' });
+      enqueueSnackbar("Failed to update comment", { variant: "error" });
     }
   };
 
   const handleDeleteComment = async (commentId) => {
-    if (!window.confirm('Are you sure you want to delete this comment?')) return;
+    if (!window.confirm("Are you sure you want to delete this comment?"))
+      return;
 
     try {
       const response = await taskService.deleteComment(id, commentId);
       setTask(response.data.task);
-      enqueueSnackbar('Comment deleted successfully', { variant: 'success' });
+      enqueueSnackbar("Comment deleted successfully", { variant: "success" });
       setCommentMenuAnchor(null);
     } catch (error) {
-      enqueueSnackbar('Failed to delete comment', { variant: 'error' });
+      enqueueSnackbar("Failed to delete comment", { variant: "error" });
     }
   };
 
   const canModifyTask = () => {
-    return user?.role === 'admin' || task?.createdBy?._id === user?._id || task?.assignedTo?._id === user?._id;
+    return (
+      user?.role === "admin" ||
+      task?.createdBy?._id === user?._id ||
+      task?.assignedTo?._id === user?._id
+    );
   };
 
   const canModifyComment = (comment) => {
-    return user?.role === 'admin' || comment.author._id === user?._id;
+    return user?.role === "admin" || comment.author._id === user?._id;
+  };
+
+  const handleDeleteFile = async (fileId) => {
+    if (!window.confirm("Are you sure you want to delete this file?")) return;
+
+    try {
+      const response = await taskService.deleteFile(id, fileId);
+      setTask(response.data.task);
+      enqueueSnackbar("File deleted successfully", { variant: "success" });
+    } catch (error) {
+      enqueueSnackbar("Failed to delete file", { variant: "error" });
+    }
   };
 
   const formatDate = (date) => {
-    return dayjs(date).format('MMM DD, YYYY');
+    return dayjs(date).format("MMM DD, YYYY");
   };
 
   if (loading) {
     return (
       <Container maxWidth="lg">
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <CircularProgress />
         </Box>
       </Container>
@@ -180,8 +202,8 @@ function TaskDetail() {
   return (
     <Container maxWidth="lg">
       {/* Header */}
-      <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <IconButton onClick={() => navigate('/tasks')}>
+      <Box sx={{ mb: 3, display: "flex", alignItems: "center", gap: 2 }}>
+        <IconButton onClick={() => navigate("/tasks")}>
           <ArrowBack />
         </IconButton>
         <Typography variant="h4" sx={{ flexGrow: 1 }}>
@@ -214,9 +236,9 @@ function TaskDetail() {
           <Paper sx={{ p: 3, mb: 3 }}>
             {/* Task Header */}
             <Box sx={{ mb: 3 }}>
-              <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+              <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
                 <Chip
-                  label={task.status.replace('_', ' ')}
+                  label={task.status.replace("_", " ")}
                   color={statusColors[task.status]}
                   size="small"
                 />
@@ -231,8 +253,12 @@ function TaskDetail() {
               <Typography variant="h5" gutterBottom>
                 {task.title}
               </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
-                {task.description || 'No description provided'}
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                sx={{ whiteSpace: "pre-wrap" }}
+              >
+                {task.description || "No description provided"}
               </Typography>
             </Box>
 
@@ -244,9 +270,14 @@ function TaskDetail() {
                 <Typography variant="subtitle2" gutterBottom>
                   Tags
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                   {task.tags.map((tag) => (
-                    <Chip key={tag} label={tag} size="small" variant="outlined" />
+                    <Chip
+                      key={tag}
+                      label={tag}
+                      size="small"
+                      variant="outlined"
+                    />
                   ))}
                 </Box>
               </Box>
@@ -260,16 +291,82 @@ function TaskDetail() {
                 </Typography>
                 <List dense>
                   {task.attachments.map((attachment) => (
-                    <ListItem key={attachment._id}>
+                    <ListItem
+                      key={attachment._id}
+                      sx={{
+                        border: 1,
+                        borderColor: "divider",
+                        borderRadius: 1,
+                        mb: 1,
+                      }}
+                    >
                       <ListItemAvatar>
-                        <Avatar>
+                        <Avatar sx={{ bgcolor: "error.main" }}>
                           <AttachFile />
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText
                         primary={attachment.originalName}
-                        secondary={`${(attachment.size / 1024).toFixed(2)} KB`}
+                        secondary={`${(attachment.size / 1024).toFixed(
+                          2
+                        )} KB • Uploaded ${dayjs(
+                          attachment.uploadedAt
+                        ).fromNow()}`}
                       />
+                      <Box sx={{ display: "flex", gap: 1 }}>
+                        <Tooltip title="Download">
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={async () => {
+                              try {
+                                // Cloudinary URLs are public, no auth needed
+                                const downloadUrl = attachment.url.replace(
+                                  "/upload/",
+                                  "/upload/fl_attachment/"
+                                );
+
+                                // Fetch without authentication (Cloudinary is public)
+                                const response = await fetch(downloadUrl);
+                                const blob = await response.blob();
+
+                                // Create download link
+                                const blobUrl =
+                                  window.URL.createObjectURL(blob);
+                                const link = document.createElement("a");
+                                link.href = blobUrl;
+                                link.download =
+                                  attachment.originalName || "document.pdf";
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                window.URL.revokeObjectURL(blobUrl);
+
+                                enqueueSnackbar("Download completed", {
+                                  variant: "success",
+                                });
+                              } catch (error) {
+                                console.error("Download error:", error);
+                                // Simple fallback
+                                window.open(attachment.url, "_blank");
+                              }
+                            }}
+                          >
+                            <Download />
+                          </IconButton>
+                        </Tooltip>
+                        {canModifyTask() && (
+                          <Tooltip title="Delete">
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => handleDeleteFile(attachment._id)}
+                            >
+                              <Delete />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Box>
                     </ListItem>
                   ))}
                 </List>
@@ -280,7 +377,7 @@ function TaskDetail() {
           {/* Comments Section */}
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              <CommentIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+              <CommentIcon sx={{ mr: 1, verticalAlign: "middle" }} />
               Comments ({task.comments?.length || 0})
             </Typography>
 
@@ -296,14 +393,18 @@ function TaskDetail() {
                 disabled={submittingComment}
                 sx={{ mb: 1 }}
               />
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                 <Button
                   type="submit"
                   variant="contained"
                   endIcon={<Send />}
                   disabled={!commentText.trim() || submittingComment}
                 >
-                  {submittingComment ? <CircularProgress size={20} /> : 'Post Comment'}
+                  {submittingComment ? (
+                    <CircularProgress size={20} />
+                  ) : (
+                    "Post Comment"
+                  )}
                 </Button>
               </Box>
             </Box>
@@ -316,19 +417,21 @@ function TaskDetail() {
                   alignItems="flex-start"
                   sx={{
                     mb: 2,
-                    bgcolor: 'background.default',
+                    bgcolor: "background.default",
                     borderRadius: 1,
                     px: 2,
                   }}
                 >
                   <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: 'primary.main' }}>
+                    <Avatar sx={{ bgcolor: "primary.main" }}>
                       {comment.author?.name?.charAt(0).toUpperCase()}
                     </Avatar>
                   </ListItemAvatar>
                   <ListItemText
                     primary={
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
                         <Typography variant="subtitle2">
                           {comment.author?.name}
                         </Typography>
@@ -348,7 +451,7 @@ function TaskDetail() {
                             onChange={(e) => setEditCommentText(e.target.value)}
                             sx={{ mb: 1 }}
                           />
-                          <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Box sx={{ display: "flex", gap: 1 }}>
                             <Button size="small" onClick={handleUpdateComment}>
                               Save
                             </Button>
@@ -356,7 +459,7 @@ function TaskDetail() {
                               size="small"
                               onClick={() => {
                                 setEditingComment(null);
-                                setEditCommentText('');
+                                setEditCommentText("");
                               }}
                             >
                               Cancel
@@ -366,7 +469,7 @@ function TaskDetail() {
                       ) : (
                         <Typography
                           variant="body2"
-                          sx={{ mt: 1, whiteSpace: 'pre-wrap' }}
+                          sx={{ mt: 1, whiteSpace: "pre-wrap" }}
                         >
                           {comment.text}
                         </Typography>
@@ -404,7 +507,7 @@ function TaskDetail() {
               </MenuItem>
               <MenuItem
                 onClick={() => handleDeleteComment(selectedComment._id)}
-                sx={{ color: 'error.main' }}
+                sx={{ color: "error.main" }}
               >
                 Delete
               </MenuItem>
@@ -419,14 +522,21 @@ function TaskDetail() {
               <Typography variant="h6" gutterBottom>
                 Task Information
               </Typography>
-              
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 {/* Created By */}
                 <Box>
                   <Typography variant="caption" color="text.secondary">
                     Created By
                   </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      mt: 0.5,
+                    }}
+                  >
                     <Avatar sx={{ width: 24, height: 24 }}>
                       {task.createdBy?.name?.charAt(0).toUpperCase()}
                     </Avatar>
@@ -441,7 +551,14 @@ function TaskDetail() {
                   <Typography variant="caption" color="text.secondary">
                     Assigned To
                   </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      mt: 0.5,
+                    }}
+                  >
                     {task.assignedTo ? (
                       <>
                         <Avatar sx={{ width: 24, height: 24 }}>
@@ -464,10 +581,17 @@ function TaskDetail() {
                   <Typography variant="caption" color="text.secondary">
                     Due Date
                   </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      mt: 0.5,
+                    }}
+                  >
                     <CalendarToday sx={{ fontSize: 20 }} />
                     <Typography variant="body2">
-                      {task.dueDate ? formatDate(task.dueDate) : 'No due date'}
+                      {task.dueDate ? formatDate(task.dueDate) : "No due date"}
                     </Typography>
                   </Box>
                 </Box>
@@ -478,7 +602,14 @@ function TaskDetail() {
                     <Typography variant="caption" color="text.secondary">
                       Estimated Hours
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mt: 0.5,
+                      }}
+                    >
                       <Schedule sx={{ fontSize: 20 }} />
                       <Typography variant="body2">
                         {task.estimatedHours} hours

@@ -45,6 +45,54 @@ const taskService = {
     const response = await api.delete(`/tasks/${taskId}/comments/${commentId}`);
     return response.data;
   },
+
+  // Add these methods to the existing taskService object
+
+uploadFiles: async (taskId, files) => {
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append('documents', file.file || file);
+  });
+
+  const response = await api.post(`/tasks/${taskId}/upload`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    onUploadProgress: (progressEvent) => {
+      const percentCompleted = Math.round(
+        (progressEvent.loaded * 100) / progressEvent.total
+      );
+      // You can use this to show upload progress
+      console.log('Upload progress:', percentCompleted);
+    },
+  });
+  return response.data;
+},
+
+deleteFile: async (taskId, fileId) => {
+  const response = await api.delete(`/tasks/${taskId}/files/${fileId}`);
+  return response.data;
+},
+
+downloadFile: async (taskId, fileId, fileName) => {
+  const response = await api.get(`/tasks/${taskId}/files/${fileId}/download`, {
+    responseType: 'blob',
+  });
+  
+  // Create a download link
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', fileName);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+  
+  return response.data;
+},
 };
+
+
 
 export default taskService;

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import FileUpload from '../../components/common/FileUpload';
 import {
   Container,
   Paper,
@@ -48,6 +49,8 @@ function TaskForm() {
   const [users, setUsers] = useState([]);
   const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState('');
+  const [files, setFiles] = useState([]);
+  const [existingFiles, setExistingFiles] = useState([]);
 
   const {
     control,
@@ -85,57 +88,84 @@ function TaskForm() {
   };
 
   const fetchTask = async () => {
-    try {
-      setLoading(true);
-      const response = await taskService.getTask(id);
-      const task = response.data.task;
-      
-      reset({
-        title: task.title,
-        description: task.description || '',
-        status: task.status,
-        priority: task.priority,
-        dueDate: task.dueDate ? dayjs(task.dueDate) : null,
-        assignedTo: task.assignedTo?._id || '',
-        estimatedHours: task.estimatedHours || '',
-      });
-      
-      setTags(task.tags || []);
-    } catch (error) {
-      enqueueSnackbar('Failed to fetch task', { variant: 'error' });
-      navigate('/tasks');
-    } finally {
-      setLoading(false);
+  try {
+    setLoading(true);
+    const response = await taskService.getTask(id);
+    const task = response.data.task;
+    
+    reset({
+      title: task.title,
+      description: task.description || '',
+      status: task.status,
+      priority: task.priority,
+      dueDate: task.dueDate ? dayjs(task.dueDate) : null,
+      assignedTo: task.assignedTo?._id || '',
+      estimatedHours: task.estimatedHours || '',
+    });
+    
+    setTags(task.tags || []);
+    
+    // Set existing files
+    if (task.attachments && task.attachments.length > 0) {
+      setExistingFiles(task.attachments.map(att => ({
+        id: att._id,
+        name: att.originalName,
+        size: att.size,
+        status: 'uploaded',
+        url: att.url,
+        publicId: att.publicId
+      })));
     }
-  };
+  } catch (error) {
+    enqueueSnackbar('Failed to fetch task', { variant: 'error' });
+    navigate('/tasks');
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const onSubmit = async (data) => {
-    try {
-      setLoading(true);
-      
-      const taskData = {
-        ...data,
-        tags,
-        dueDate: data.dueDate ? data.dueDate.toISOString() : null,
-        assignedTo: data.assignedTo || null,
-        estimatedHours: data.estimatedHours || null,
-      };
+const onSubmit = async (data) => {
+  try {
+    setLoading(true);
+    
+    const taskData = {
+      ...data,
+      tags,
+      dueDate: data.dueDate ? data.dueDate.toISOString() : null,
+      assignedTo: data.assignedTo || null,
+      estimatedHours: data.estimatedHours || null,
+    };
 
-      if (isEdit) {
-        await taskService.updateTask(id, taskData);
-        enqueueSnackbar('Task updated successfully', { variant: 'success' });
-      } else {
-        await taskService.createTask(taskData);
-        enqueueSnackbar('Task created successfully', { variant: 'success' });
+    let taskId;
+    
+    if (isEdit) {
+      const response = await taskService.updateTask(id, taskData);
+      taskId = id;
+      enqueueSnackbar('Task updated successfully', { variant: 'success' });
+    } else {
+      const response = await taskService.createTask(taskData);
+      taskId = response.data.task._id;
+      enqueueSnackbar('Task created successfully', { variant: 'success' });
+    }
+    
+    // Upload new files if any
+    const newFiles = files.filter(f => f.status === 'pending');
+    if (newFiles.length > 0) {
+      try {
+        await taskService.uploadFiles(taskId, newFiles);
+        enqueueSnackbar('Files uploaded successfully', { variant: 'success' });
+      } catch (error) {
+        enqueueSnackbar('Failed to upload some files', { variant: 'warning' });
       }
-      
-      navigate('/tasks');
-    } catch (error) {
-      enqueueSnackbar(error.response?.data?.message || 'Failed to save task', { variant: 'error' });
-    } finally {
-      setLoading(false);
     }
-  };
+    
+    navigate('/tasks');
+  } catch (error) {
+    enqueueSnackbar(error.response?.data?.message || 'Failed to save task', { variant: 'error' });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleAddTag = (e) => {
     if (e.key === 'Enter' && tagInput.trim()) {
@@ -326,6 +356,25 @@ function TaskForm() {
                   />
                 ))}
               </Box>
+            </Grid>
+
+            {/* File Upload - Add this before Actions Grid item */}
+            <Grid item xs={12}>
+            <Typography variant="subtitle2" gutterBottom>
+                Attachments (PDF only, max 3 files)
+            </Typography>
+            <FileUpload
+                files={[...existingFiles, ...files]}
+                onFilesChange={(newFiles) => {
+                // Separate existing and new files
+                const existing = newFiles.filter(f => f.status === 'uploaded');
+                const pending = newFiles.filter(f => f.status === 'pending');
+                setExistingFiles(existing);
+                setFiles(pending);
+                }}
+                maxFiles={3}
+                disabled={loading}
+            />
             </Grid>
 
             {/* Actions */}
