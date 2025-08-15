@@ -1,30 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Container,
   Paper,
   Typography,
   Box,
+  Stack,
+  Divider,
   Chip,
   Button,
-  TextField,
   IconButton,
+  Tooltip,
   Avatar,
-  Divider,
-  Grid,
-  Card,
-  CardContent,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
+  TextField,
   CircularProgress,
-  Alert,
-  Menu,
-  MenuItem,
-  Tooltip,
-} from "@mui/material";
+  Skeleton,
+} from '@mui/material';
 import {
   ArrowBack,
   Edit,
@@ -33,89 +27,120 @@ import {
   CalendarToday,
   Person,
   Schedule,
-  Comment as CommentIcon,
-  MoreVert,
   AttachFile,
+  Download,
   Send,
-  Download, // Add this
-} from "@mui/icons-material";
-import { useSnackbar } from "notistack";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import taskService from "../../services/taskService";
+  MoreVert,
+} from '@mui/icons-material';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
+import taskService from '../../services/taskService';
 
-dayjs.extend(relativeTime);
-
-const priorityColors = {
-  low: "success",
-  medium: "warning",
-  high: "error",
-  urgent: "error",
+const STATUS_COLOR = {
+  pending: 'default',
+  in_progress: 'info',
+  completed: 'success',
+  cancelled: 'error',
+};
+const PRIORITY_COLOR = {
+  low: 'success',
+  medium: 'warning',
+  high: 'error',
+  urgent: 'error',
 };
 
-const statusColors = {
-  pending: "default",
-  in_progress: "primary",
-  completed: "success",
-  cancelled: "error",
-};
+function SectionCard({ title, action, children, id }) {
+  return (
+    <Paper
+      component="section"
+      aria-labelledby={id}
+      elevation={2}
+      sx={{
+        p: { xs: 2.5, md: 3 },
+        borderRadius: 2,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      {(title || action) && (
+        <>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+            {title ? (
+              <Typography id={id} variant="h6" fontWeight={600}>
+                {title}
+              </Typography>
+            ) : (
+              <span />
+            )}
+            {action || null}
+          </Stack>
+          <Divider sx={{ mb: 2 }} />
+        </>
+      )}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</Box>
+    </Paper>
+  );
+}
 
-function TaskDetail() {
-  const { id } = useParams();
+export default function TaskDetail() {
   const navigate = useNavigate();
+  const { id } = useParams();
   const { enqueueSnackbar } = useSnackbar();
-  const user = useSelector((state) => state.auth.user);
 
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [commentText, setCommentText] = useState("");
-  const [submittingComment, setSubmittingComment] = useState(false);
-  const [commentMenuAnchor, setCommentMenuAnchor] = useState(null);
-  const [selectedComment, setSelectedComment] = useState(null);
-  const [editingComment, setEditingComment] = useState(null);
-  const [editCommentText, setEditCommentText] = useState("");
 
-  useEffect(() => {
-    fetchTask();
-  }, [id]);
+  const [commentText, setCommentText] = useState('');
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editCommentText, setEditCommentText] = useState('');
 
   const fetchTask = async () => {
     try {
       setLoading(true);
-      const response = await taskService.getTask(id);
-      setTask(response.data.task);
-    } catch (error) {
-      enqueueSnackbar("Failed to fetch task", { variant: "error" });
-      navigate("/tasks");
+      const res = await taskService.getTask(id);
+      setTask(res.data.task);
+    } catch (err) {
+      enqueueSnackbar('Failed to load task', { variant: 'error' });
+      navigate('/tasks');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this task?")) return;
+  useEffect(() => {
+    fetchTask();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
+  const canModifyTask = useMemo(() => {
+    // server enforces; here just enabling buttons when present
+    return !!task;
+  }, [task]);
+
+  const handleDeleteTask = async () => {
+    if (!window.confirm('Delete this task?')) return;
     try {
       await taskService.deleteTask(id);
-      enqueueSnackbar("Task deleted successfully", { variant: "success" });
-      navigate("/tasks");
-    } catch (error) {
-      enqueueSnackbar("Failed to delete task", { variant: "error" });
+      enqueueSnackbar('Task deleted', { variant: 'success' });
+      navigate('/tasks');
+    } catch (err) {
+      enqueueSnackbar('Failed to delete task', { variant: 'error' });
     }
   };
 
   const handleAddComment = async (e) => {
     e.preventDefault();
     if (!commentText.trim()) return;
-
     try {
       setSubmittingComment(true);
-      const response = await taskService.addComment(id, commentText);
-      setTask(response.data.task);
-      setCommentText("");
-      enqueueSnackbar("Comment added successfully", { variant: "success" });
-    } catch (error) {
-      enqueueSnackbar("Failed to add comment", { variant: "error" });
+      const res = await taskService.addComment(id, commentText.trim());
+      setTask(res.data.task);
+      setCommentText('');
+      enqueueSnackbar('Comment added', { variant: 'success' });
+    } catch (err) {
+      enqueueSnackbar('Failed to add comment', { variant: 'error' });
     } finally {
       setSubmittingComment(false);
     }
@@ -123,539 +148,378 @@ function TaskDetail() {
 
   const handleUpdateComment = async () => {
     if (!editCommentText.trim()) return;
-
     try {
-      const response = await taskService.updateComment(
-        id,
-        editingComment,
-        editCommentText
-      );
-      setTask(response.data.task);
-      setEditingComment(null);
-      setEditCommentText("");
-      enqueueSnackbar("Comment updated successfully", { variant: "success" });
-    } catch (error) {
-      enqueueSnackbar("Failed to update comment", { variant: "error" });
+      const res = await taskService.updateComment(id, editingCommentId, editCommentText.trim());
+      setTask(res.data.task);
+      setEditingCommentId(null);
+      setEditCommentText('');
+      enqueueSnackbar('Comment updated', { variant: 'success' });
+    } catch (err) {
+      enqueueSnackbar('Failed to update comment', { variant: 'error' });
     }
   };
 
   const handleDeleteComment = async (commentId) => {
-    if (!window.confirm("Are you sure you want to delete this comment?"))
-      return;
-
+    if (!window.confirm('Delete this comment?')) return;
     try {
-      const response = await taskService.deleteComment(id, commentId);
-      setTask(response.data.task);
-      enqueueSnackbar("Comment deleted successfully", { variant: "success" });
-      setCommentMenuAnchor(null);
-    } catch (error) {
-      enqueueSnackbar("Failed to delete comment", { variant: "error" });
+      const res = await taskService.deleteComment(id, commentId);
+      setTask(res.data.task);
+      enqueueSnackbar('Comment deleted', { variant: 'success' });
+    } catch (err) {
+      enqueueSnackbar('Failed to delete comment', { variant: 'error' });
     }
-  };
-
-  const canModifyTask = () => {
-    return (
-      user?.role === "admin" ||
-      task?.createdBy?._id === user?._id ||
-      task?.assignedTo?._id === user?._id
-    );
-  };
-
-  const canModifyComment = (comment) => {
-    return user?.role === "admin" || comment.author._id === user?._id;
   };
 
   const handleDeleteFile = async (fileId) => {
-    if (!window.confirm("Are you sure you want to delete this file?")) return;
-
+    if (!window.confirm('Delete this file?')) return;
     try {
-      const response = await taskService.deleteFile(id, fileId);
-      setTask(response.data.task);
-      enqueueSnackbar("File deleted successfully", { variant: "success" });
-    } catch (error) {
-      enqueueSnackbar("Failed to delete file", { variant: "error" });
+      const res = await taskService.deleteFile(id, fileId);
+      setTask(res.data.task);
+      enqueueSnackbar('File deleted', { variant: 'success' });
+    } catch (err) {
+      enqueueSnackbar('Failed to delete file', { variant: 'error' });
     }
   };
 
-  const formatDate = (date) => {
-    return dayjs(date).format("MMM DD, YYYY");
+  const handleDownloadFile = (att) => {
+    const url = att.url?.replace('/upload/', '/upload/fl_attachment/');
+    const link = document.createElement('a');
+    link.href = url || att.url;
+    const name = att.originalName?.toLowerCase().endsWith('.pdf') ? att.originalName : `${att.originalName || 'document'}.pdf`;
+    link.download = name;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
-  if (loading) {
-    return (
-      <Container maxWidth="lg">
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-          <CircularProgress />
-        </Box>
-      </Container>
-    );
-  }
-
-  if (!task) {
-    return (
-      <Container maxWidth="lg">
-        <Alert severity="error">Task not found</Alert>
-      </Container>
-    );
-  }
+  const format = (d) => (d ? new Date(d).toLocaleDateString() : '-');
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" sx={{ py: { xs: 2, md: 3 } }}>
       {/* Header */}
-      <Box sx={{ mb: 3, display: "flex", alignItems: "center", gap: 2 }}>
-        <IconButton onClick={() => navigate("/tasks")}>
-          <ArrowBack />
-        </IconButton>
-        <Typography variant="h4" sx={{ flexGrow: 1 }}>
-          Task Details
-        </Typography>
-        {canModifyTask() && (
-          <>
-            <Button
-              variant="outlined"
-              startIcon={<Edit />}
-              onClick={() => navigate(`/tasks/${id}/edit`)}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="outlined"
-              color="error"
-              startIcon={<Delete />}
-              onClick={handleDelete}
-            >
-              Delete
-            </Button>
-          </>
-        )}
-      </Box>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
+        <Stack direction="row" spacing={1}>
+          <Button variant="outlined" startIcon={<ArrowBack />} onClick={() => navigate('/tasks')} sx={{ textTransform: 'none' }}>
+            Back
+          </Button>
+        </Stack>
+        <Stack direction="row" spacing={1.5}>
+          <Button variant="outlined" startIcon={<Edit />} onClick={() => navigate(`/tasks/${id}/edit`)} sx={{ textTransform: 'none' }} disabled={!task}>
+            Edit
+          </Button>
+          <Button variant="contained" color="error" startIcon={<Delete />} onClick={handleDeleteTask} sx={{ textTransform: 'none' }} disabled={!task}>
+            Delete
+          </Button>
+        </Stack>
+      </Stack>
 
-      <Grid container spacing={3}>
-        {/* Main Content */}
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, mb: 3 }}>
-            {/* Task Header */}
-            <Box sx={{ mb: 3 }}>
-              <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-                <Chip
-                  label={task.status.replace("_", " ")}
-                  color={statusColors[task.status]}
-                  size="small"
-                />
-                <Chip
-                  icon={<Flag />}
-                  label={task.priority}
-                  color={priorityColors[task.priority]}
-                  size="small"
-                  variant="outlined"
-                />
-              </Box>
-              <Typography variant="h5" gutterBottom>
-                {task.title}
-              </Typography>
-              <Typography
-                variant="body1"
-                color="text.secondary"
-                sx={{ whiteSpace: "pre-wrap" }}
-              >
-                {task.description || "No description provided"}
-              </Typography>
-            </Box>
+      {/* Grid layout */}
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 3,
+          gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' },
+          alignItems: 'stretch',
+        }}
+      >
+        {/* Left column: Overview + Attachments + Comments */}
+        <Stack spacing={3}>
+          {/* Overview */}
+          <SectionCard id="overview" title="Task Overview">
+            {loading || !task ? (
+              <Skeleton variant="rectangular" height={180} />
+            ) : (
+              <Stack spacing={2}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Chip
+                    size="small"
+                    label={task.status?.replace('_', ' ') || 'pending'}
+                    color={STATUS_COLOR[task.status] || 'default'}
+                  />
+                  <Chip
+                    size="small"
+                    variant="outlined"
+                    icon={<Flag fontSize="small" />}
+                    label={task.priority || 'medium'}
+                    color={PRIORITY_COLOR[task.priority] || 'default'}
+                  />
+                </Stack>
 
-            <Divider sx={{ my: 3 }} />
-
-            {/* Tags */}
-            {task.tags && task.tags.length > 0 && (
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle2" gutterBottom>
-                  Tags
+                <Typography variant="h5" fontWeight={700} noWrap>
+                  {task.title}
                 </Typography>
-                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                  {task.tags.map((tag) => (
-                    <Chip
-                      key={tag}
-                      label={tag}
-                      size="small"
-                      variant="outlined"
-                    />
-                  ))}
-                </Box>
-              </Box>
+
+                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
+                  {task.description || 'No description provided'}
+                </Typography>
+
+                {task.tags && task.tags.length > 0 && (
+                  <Stack direction="row" spacing={1} flexWrap="wrap">
+                    {task.tags.map((t) => (
+                      <Chip key={t} size="small" label={t} sx={{ mb: 1 }} />
+                    ))}
+                  </Stack>
+                )}
+              </Stack>
             )}
+          </SectionCard>
 
-            {/* Attachments */}
-            {task.attachments && task.attachments.length > 0 && (
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle2" gutterBottom>
-                  Attachments ({task.attachments.length})
-                </Typography>
-                <List dense>
-                  {task.attachments.map((attachment) => (
-                    <ListItem
-                      key={attachment._id}
-                      sx={{
-                        border: 1,
-                        borderColor: "divider",
-                        borderRadius: 1,
-                        mb: 1,
-                      }}
-                    >
-                      <ListItemAvatar>
-                        <Avatar sx={{ bgcolor: "error.main" }}>
-                          <AttachFile />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={attachment.originalName}
-                        secondary={`${(attachment.size / 1024).toFixed(
-                          2
-                        )} KB • Uploaded ${dayjs(
-                          attachment.uploadedAt
-                        ).fromNow()}`}
-                      />
-                      <Box sx={{ display: "flex", gap: 1 }}>
+          {/* Attachments */}
+          <SectionCard id="attachments" title="Attachments">
+            {loading || !task ? (
+              <Skeleton variant="rectangular" height={120} />
+            ) : task.attachments?.length ? (
+              <List dense sx={{ m: 0 }}>
+                {task.attachments.map((att) => (
+                  <ListItem
+                    key={att._id}
+                    sx={{
+                      border: 1,
+                      borderColor: 'divider',
+                      borderRadius: 1,
+                      mb: 1,
+                    }}
+                    secondaryAction={
+                      <Stack direction="row" spacing={1}>
                         <Tooltip title="Download">
-                          <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={async () => {
-                              try {
-                                // Cloudinary URLs are public, no auth needed
-                                const downloadUrl = attachment.url.replace(
-                                  "/upload/",
-                                  "/upload/fl_attachment/"
-                                );
-
-                                // Fetch without authentication (Cloudinary is public)
-                                const response = await fetch(downloadUrl);
-                                const blob = await response.blob();
-
-                                // Create download link
-                                const blobUrl =
-                                  window.URL.createObjectURL(blob);
-                                const link = document.createElement("a");
-                                link.href = blobUrl;
-                                link.download =
-                                  attachment.originalName || "document.pdf";
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-                                window.URL.revokeObjectURL(blobUrl);
-
-                                enqueueSnackbar("Download completed", {
-                                  variant: "success",
-                                });
-                              } catch (error) {
-                                console.error("Download error:", error);
-                                // Simple fallback
-                                window.open(attachment.url, "_blank");
-                              }
-                            }}
-                          >
-                            <Download />
+                          <IconButton size="small" color="primary" onClick={() => handleDownloadFile(att)}>
+                            <Download fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        {canModifyTask() && (
-                          <Tooltip title="Delete">
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() => handleDeleteFile(attachment._id)}
-                            >
-                              <Delete />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                      </Box>
-                    </ListItem>
-                  ))}
-                </List>
-              </Box>
-            )}
-          </Paper>
-
-          {/* Comments Section */}
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              <CommentIcon sx={{ mr: 1, verticalAlign: "middle" }} />
-              Comments ({task.comments?.length || 0})
-            </Typography>
-
-            {/* Comment Input */}
-            <Box component="form" onSubmit={handleAddComment} sx={{ mb: 3 }}>
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                placeholder="Add a comment..."
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                disabled={submittingComment}
-                sx={{ mb: 1 }}
-              />
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  endIcon={<Send />}
-                  disabled={!commentText.trim() || submittingComment}
-                >
-                  {submittingComment ? (
-                    <CircularProgress size={20} />
-                  ) : (
-                    "Post Comment"
-                  )}
-                </Button>
-              </Box>
-            </Box>
-
-            {/* Comments List */}
-            <List>
-              {task.comments?.map((comment) => (
-                <ListItem
-                  key={comment._id}
-                  alignItems="flex-start"
-                  sx={{
-                    mb: 2,
-                    bgcolor: "background.default",
-                    borderRadius: 1,
-                    px: 2,
-                  }}
-                >
-                  <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: "primary.main" }}>
-                      {comment.author?.name?.charAt(0).toUpperCase()}
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
-                        <Typography variant="subtitle2">
-                          {comment.author?.name}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {dayjs(comment.createdAt).fromNow()}
-                        </Typography>
-                      </Box>
+                        <Tooltip title="Delete">
+                          <IconButton size="small" color="error" onClick={() => handleDeleteFile(att._id)}>
+                            <Delete fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
                     }
-                    secondary={
-                      editingComment === comment._id ? (
-                        <Box sx={{ mt: 1 }}>
-                          <TextField
-                            fullWidth
-                            multiline
-                            rows={2}
-                            value={editCommentText}
-                            onChange={(e) => setEditCommentText(e.target.value)}
-                            sx={{ mb: 1 }}
-                          />
-                          <Box sx={{ display: "flex", gap: 1 }}>
-                            <Button size="small" onClick={handleUpdateComment}>
-                              Save
-                            </Button>
-                            <Button
-                              size="small"
-                              onClick={() => {
-                                setEditingComment(null);
-                                setEditCommentText("");
-                              }}
-                            >
-                              Cancel
-                            </Button>
-                          </Box>
-                        </Box>
-                      ) : (
-                        <Typography
-                          variant="body2"
-                          sx={{ mt: 1, whiteSpace: "pre-wrap" }}
-                        >
-                          {comment.text}
+                  >
+                    <ListItemAvatar>
+                      <Avatar sx={{ bgcolor: 'error.main' }}>
+                        <AttachFile />
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <Typography variant="body2" noWrap title={att.originalName}>
+                          {att.originalName}
                         </Typography>
-                      )
-                    }
-                  />
-                  {canModifyComment(comment) && !editingComment && (
-                    <IconButton
-                      edge="end"
-                      onClick={(e) => {
-                        setCommentMenuAnchor(e.currentTarget);
-                        setSelectedComment(comment);
-                      }}
-                    >
-                      <MoreVert />
-                    </IconButton>
-                  )}
-                </ListItem>
-              ))}
-            </List>
-
-            <Menu
-              anchorEl={commentMenuAnchor}
-              open={Boolean(commentMenuAnchor)}
-              onClose={() => setCommentMenuAnchor(null)}
-            >
-              <MenuItem
-                onClick={() => {
-                  setEditingComment(selectedComment._id);
-                  setEditCommentText(selectedComment.text);
-                  setCommentMenuAnchor(null);
-                }}
-              >
-                Edit
-              </MenuItem>
-              <MenuItem
-                onClick={() => handleDeleteComment(selectedComment._id)}
-                sx={{ color: "error.main" }}
-              >
-                Delete
-              </MenuItem>
-            </Menu>
-          </Paper>
-        </Grid>
-
-        {/* Sidebar */}
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Task Information
+                      }
+                      secondary={
+                        <Typography variant="caption" color="text.secondary" component="span">
+                          {(att.size / 1024).toFixed(1)} KB • Uploaded {new Date(att.uploadedAt).toLocaleString()}
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No attachments.
               </Typography>
+            )}
+          </SectionCard>
 
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                {/* Created By */}
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    Created By
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      mt: 0.5,
-                    }}
-                  >
-                    <Avatar sx={{ width: 24, height: 24 }}>
-                      {task.createdBy?.name?.charAt(0).toUpperCase()}
-                    </Avatar>
-                    <Typography variant="body2">
-                      {task.createdBy?.name}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* Assigned To */}
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    Assigned To
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      mt: 0.5,
-                    }}
-                  >
-                    {task.assignedTo ? (
-                      <>
-                        <Avatar sx={{ width: 24, height: 24 }}>
-                          {task.assignedTo.name?.charAt(0).toUpperCase()}
-                        </Avatar>
-                        <Typography variant="body2">
-                          {task.assignedTo.name}
-                        </Typography>
-                      </>
-                    ) : (
-                      <Typography variant="body2" color="text.secondary">
-                        Unassigned
-                      </Typography>
-                    )}
-                  </Box>
-                </Box>
-
-                {/* Due Date */}
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    Due Date
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      mt: 0.5,
-                    }}
-                  >
-                    <CalendarToday sx={{ fontSize: 20 }} />
-                    <Typography variant="body2">
-                      {task.dueDate ? formatDate(task.dueDate) : "No due date"}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* Estimated Hours */}
-                {task.estimatedHours && (
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">
-                      Estimated Hours
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        mt: 0.5,
-                      }}
+          {/* Comments */}
+          <SectionCard id="comments" title="Comments">
+            {loading || !task ? (
+              <Skeleton variant="rectangular" height={180} />
+            ) : (
+              <>
+                <Box component="form" onSubmit={handleAddComment} sx={{ mb: 2 }}>
+                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+                    <TextField
+                      fullWidth
+                      multiline
+                      minRows={2}
+                      placeholder="Add a comment…"
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                    />
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      endIcon={submittingComment ? <CircularProgress size={18} color="inherit" /> : <Send />}
+                      disabled={submittingComment || !commentText.trim()}
+                      sx={{ textTransform: 'none' }}
                     >
-                      <Schedule sx={{ fontSize: 20 }} />
-                      <Typography variant="body2">
-                        {task.estimatedHours} hours
-                      </Typography>
-                    </Box>
-                  </Box>
-                )}
-
-                {/* Created At */}
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    Created
-                  </Typography>
-                  <Typography variant="body2">
-                    {formatDate(task.createdAt)}
-                  </Typography>
+                      Post
+                    </Button>
+                  </Stack>
                 </Box>
 
-                {/* Updated At */}
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    Last Updated
-                  </Typography>
-                  <Typography variant="body2">
-                    {dayjs(task.updatedAt).fromNow()}
-                  </Typography>
-                </Box>
+                <List dense sx={{ m: 0 }}>
+                  {task.comments?.length ? (
+                    task.comments.map((c) => (
+                      <ListItem
+                        key={c._id}
+                        sx={{
+                          border: 1,
+                          borderColor: 'divider',
+                          borderRadius: 1,
+                          mb: 1,
+                          alignItems: 'flex-start',
+                        }}
+                        secondaryAction={
+                          <Stack direction="row" spacing={1}>
+                            {editingCommentId === c._id ? null : (
+                              <>
+                                <Tooltip title="Edit">
+                                  <IconButton size="small" onClick={() => { setEditingCommentId(c._id); setEditCommentText(c.text); }}>
+                                    <Edit fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Delete">
+                                  <IconButton size="small" color="error" onClick={() => handleDeleteComment(c._id)}>
+                                    <Delete fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              </>
+                            )}
+                          </Stack>
+                        }
+                      >
+                        <ListItemAvatar>
+                          <Avatar sx={{ bgcolor: 'primary.main' }}>
+                            {(c.author?.name || 'U').charAt(0).toUpperCase()}
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={
+                            <Stack direction="row" spacing={1} alignItems="center">
+                              <Typography variant="subtitle2">{c.author?.name || 'User'}</Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                {new Date(c.createdAt).toLocaleString()}
+                              </Typography>
+                            </Stack>
+                          }
+                          secondary={
+                            editingCommentId === c._id ? (
+                              <Stack spacing={1} sx={{ mt: 1 }}>
+                                <TextField
+                                  fullWidth
+                                  multiline
+                                  minRows={2}
+                                  value={editCommentText}
+                                  onChange={(e) => setEditCommentText(e.target.value)}
+                                />
+                                <Stack direction="row" spacing={1} justifyContent="flex-end">
+                                  <Button variant="text" onClick={() => { setEditingCommentId(null); setEditCommentText(''); }}>
+                                    Cancel
+                                  </Button>
+                                  <Button variant="contained" onClick={handleUpdateComment}>
+                                    Save
+                                  </Button>
+                                </Stack>
+                              </Stack>
+                            ) : (
+                              <Typography variant="body2" color="text.secondary" component="span" sx={{ mt: 0.5, display: 'block', whiteSpace: 'pre-wrap' }}>
+                                {c.text}
+                              </Typography>
+                            )
+                          }
+                        />
+                      </ListItem>
+                    ))
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      No comments yet.
+                    </Typography>
+                  )}
+                </List>
+              </>
+            )}
+          </SectionCard>
+        </Stack>
 
-                {/* Completed At */}
-                {task.completedAt && (
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">
-                      Completed
-                    </Typography>
-                    <Typography variant="body2">
-                      {formatDate(task.completedAt)}
-                    </Typography>
-                  </Box>
-                )}
+        {/* Right column: Info */}
+        <SectionCard id="info" title="Task Info">
+          {loading || !task ? (
+            <Skeleton variant="rectangular" height={260} />
+          ) : (
+            <Stack spacing={2}>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Created By
+                </Typography>
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+                  <Avatar sx={{ width: 28, height: 28 }}>
+                    {(task.createdBy?.name || 'U').charAt(0).toUpperCase()}
+                  </Avatar>
+                  <Typography variant="body2">{task.createdBy?.name || '-'}</Typography>
+                </Stack>
               </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Assigned To
+                </Typography>
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+                  {task.assignedTo ? (
+                    <>
+                      <Avatar sx={{ width: 28, height: 28 }}>
+                        {(task.assignedTo?.name || 'U').charAt(0).toUpperCase()}
+                      </Avatar>
+                      <Typography variant="body2">{task.assignedTo?.name}</Typography>
+                    </>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      Unassigned
+                    </Typography>
+                  )}
+                </Stack>
+              </Box>
+
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Due Date
+                </Typography>
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+                  <CalendarToday fontSize="small" color="action" />
+                  <Typography variant="body2">{format(task.dueDate)}</Typography>
+                </Stack>
+              </Box>
+
+              {!!task.estimatedHours && (
+                <Box>
+                  <Typography variant="caption" color="text.secondary">
+                    Estimated Hours
+                  </Typography>
+                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+                    <Schedule fontSize="small" color="action" />
+                    <Typography variant="body2">{task.estimatedHours}</Typography>
+                  </Stack>
+                </Box>
+              )}
+
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Created
+                </Typography>
+                <Typography variant="body2">{format(task.createdAt)}</Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Last Updated
+                </Typography>
+                <Typography variant="body2">{new Date(task.updatedAt).toLocaleString()}</Typography>
+              </Box>
+
+              {task.completedAt && (
+                <Box>
+                  <Typography variant="caption" color="text.secondary">
+                    Completed
+                  </Typography>
+                  <Typography variant="body2">{format(task.completedAt)}</Typography>
+                </Box>
+              )}
+            </Stack>
+          )}
+        </SectionCard>
+      </Box>
     </Container>
   );
 }
-
-export default TaskDetail;

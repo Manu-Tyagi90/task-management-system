@@ -1,408 +1,401 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import FileUpload from '../../components/common/FileUpload';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Container,
   Paper,
-  TextField,
-  Button,
   Typography,
   Box,
-  Grid,
+  Stack,
+  Divider,
+  TextField,
   MenuItem,
+  Button,
   Chip,
   IconButton,
-  FormControl,
-  InputLabel,
-  Select,
-  FormHelperText,
-  CircularProgress,
-  Alert,
+  Skeleton,
 } from '@mui/material';
+import { Save, Cancel, Add, Flag } from '@mui/icons-material';
 import { DatePicker } from '@mui/x-date-pickers';
-import { Save, Cancel, Add, Close } from '@mui/icons-material';
-import { useSnackbar } from 'notistack';
+import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
+import { useSnackbar } from 'notistack';
 import taskService from '../../services/taskService';
 import userService from '../../services/userService';
+import FileUpload from '../../components/common/FileUpload';
 
-const schema = yup.object({
-  title: yup.string().required('Title is required').min(3, 'Title must be at least 3 characters'),
-  description: yup.string().max(1000, 'Description cannot exceed 1000 characters'),
-  status: yup.string().required('Status is required'),
-  priority: yup.string().required('Priority is required'),
-  dueDate: yup.date().nullable().min(new Date(), 'Due date must be in the future'),
-  assignedTo: yup.string().nullable(),
-  estimatedHours: yup.number().nullable().positive('Must be positive').max(1000, 'Too many hours'),
-});
+const STATUS_OPTS = [
+  { value: 'pending', label: 'Pending' },
+  { value: 'in_progress', label: 'In Progress' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'cancelled', label: 'Cancelled' },
+];
+const PRIORITY_OPTS = [
+  { value: 'low', label: 'Low' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'high', label: 'High' },
+  { value: 'urgent', label: 'Urgent' },
+];
 
-function TaskForm() {
+function SectionCard({ title, action, children, id }) {
+  return (
+    <Paper
+      component="section"
+      aria-labelledby={id}
+      elevation={2}
+      sx={{
+        p: { xs: 2.5, md: 3 },
+        borderRadius: 2,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      {(title || action) && (
+        <>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+            {title ? (
+              <Typography id={id} variant="h6" fontWeight={600}>
+                {title}
+              </Typography>
+            ) : (
+              <span />
+            )}
+            {action || null}
+          </Stack>
+          <Divider sx={{ mb: 2 }} />
+        </>
+      )}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</Box>
+    </Paper>
+  );
+}
+
+export default function TaskForm() {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id } = useParams(); // if present => edit
   const { enqueueSnackbar } = useSnackbar();
-  const isEdit = !!id;
-  
-  const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState([]);
-  const [tags, setTags] = useState([]);
-  const [tagInput, setTagInput] = useState('');
-  const [files, setFiles] = useState([]);
-  const [existingFiles, setExistingFiles] = useState([]);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setValue,
-  } = useForm({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      title: '',
-      description: '',
-      status: 'pending',
-      priority: 'medium',
-      dueDate: null,
-      assignedTo: '',
-      estimatedHours: '',
-    },
+  const isEdit = Boolean(id);
+  const [loading, setLoading] = useState(isEdit);
+  const [saving, setSaving] = useState(false);
+
+  const [users, setUsers] = useState([]);
+
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    status: 'pending',
+    priority: 'medium',
+    dueDate: null,
+    assignedTo: '',
+    estimatedHours: '',
   });
 
-  useEffect(() => {
-    fetchUsers();
-    if (isEdit) {
-      fetchTask();
-    }
-  }, [id]);
+  // Tags handling
+  const [tags, setTags] = useState([]);
+  const [tagInput, setTagInput] = useState('');
 
-  const fetchUsers = async () => {
+  // Files
+  const [files, setFiles] = useState([]); // pending (new)
+  const [existingFiles, setExistingFiles] = useState([]); // already uploaded
+
+  const fetchAssignableUsers = async () => {
     try {
-      const response = await userService.getAssignableUsers();
-      setUsers(response.data.users);
-    } catch (error) {
-      console.error('Failed to fetch users:', error);
+      const res = await userService.getAssignableUsers();
+      setUsers(res.data.users || []);
+    } catch {
+      // optional
     }
   };
 
   const fetchTask = async () => {
-  try {
-    setLoading(true);
-    const response = await taskService.getTask(id);
-    const task = response.data.task;
-    
-    reset({
-      title: task.title,
-      description: task.description || '',
-      status: task.status,
-      priority: task.priority,
-      dueDate: task.dueDate ? dayjs(task.dueDate) : null,
-      assignedTo: task.assignedTo?._id || '',
-      estimatedHours: task.estimatedHours || '',
-    });
-    
-    setTags(task.tags || []);
-    
-    // Set existing files
-    if (task.attachments && task.attachments.length > 0) {
-      setExistingFiles(task.attachments.map(att => ({
-        id: att._id,
-        name: att.originalName,
-        size: att.size,
-        status: 'uploaded',
-        url: att.url,
-        publicId: att.publicId
-      })));
+    if (!isEdit) return;
+    try {
+      setLoading(true);
+      const res = await taskService.getTask(id);
+      const t = res.data.task;
+      setForm({
+        title: t.title || '',
+        description: t.description || '',
+        status: t.status || 'pending',
+        priority: t.priority || 'medium',
+        dueDate: t.dueDate ? dayjs(t.dueDate) : null,
+        assignedTo: t.assignedTo?._id || '',
+        estimatedHours: t.estimatedHours || '',
+      });
+      setTags(t.tags || []);
+      setExistingFiles(
+        (t.attachments || []).map((att) => ({
+          id: att._id,
+          name: att.originalName,
+          size: att.size,
+          status: 'uploaded',
+          url: att.url,
+          publicId: att.publicId,
+        }))
+      );
+    } catch (err) {
+      enqueueSnackbar('Failed to load task', { variant: 'error' });
+      navigate('/tasks');
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    enqueueSnackbar('Failed to fetch task', { variant: 'error' });
-    navigate('/tasks');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-const onSubmit = async (data) => {
-  try {
-    setLoading(true);
-    
-    const taskData = {
-      ...data,
-      tags,
-      dueDate: data.dueDate ? data.dueDate.toISOString() : null,
-      assignedTo: data.assignedTo || null,
-      estimatedHours: data.estimatedHours || null,
-    };
-
-    let taskId;
-    
-    if (isEdit) {
-      const response = await taskService.updateTask(id, taskData);
-      taskId = id;
-      enqueueSnackbar('Task updated successfully', { variant: 'success' });
-    } else {
-      const response = await taskService.createTask(taskData);
-      taskId = response.data.task._id;
-      enqueueSnackbar('Task created successfully', { variant: 'success' });
-    }
-    
-    // Upload new files if any
-    const newFiles = files.filter(f => f.status === 'pending');
-    if (newFiles.length > 0) {
-      try {
-        await taskService.uploadFiles(taskId, newFiles);
-        enqueueSnackbar('Files uploaded successfully', { variant: 'success' });
-      } catch (error) {
-        enqueueSnackbar('Failed to upload some files', { variant: 'warning' });
-      }
-    }
-    
-    navigate('/tasks');
-  } catch (error) {
-    enqueueSnackbar(error.response?.data?.message || 'Failed to save task', { variant: 'error' });
-  } finally {
-    setLoading(false);
-  }
-};
+  useEffect(() => {
+    fetchAssignableUsers();
+    fetchTask();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const handleAddTag = (e) => {
     if (e.key === 'Enter' && tagInput.trim()) {
       e.preventDefault();
-      if (!tags.includes(tagInput.trim().toLowerCase())) {
-        setTags([...tags, tagInput.trim().toLowerCase()]);
-      }
+      const val = tagInput.trim().toLowerCase();
+      if (!tags.includes(val)) setTags((s) => [...s, val]);
       setTagInput('');
     }
   };
 
-  const handleRemoveTag = (tagToRemove) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
+  const handleRemoveTag = (t) => setTags((s) => s.filter((x) => x !== t));
+
+  const onSave = async () => {
+    if (!form.title.trim()) {
+      enqueueSnackbar('Title is required', { variant: 'warning' });
+      return;
+    }
+    try {
+      setSaving(true);
+      const payload = {
+        title: form.title.trim(),
+        description: form.description.trim(),
+        status: form.status,
+        priority: form.priority,
+        dueDate: form.dueDate ? form.dueDate.toISOString() : null,
+        assignedTo: form.assignedTo || null,
+        estimatedHours: form.estimatedHours ? Number(form.estimatedHours) : null,
+        tags,
+      };
+
+      let taskId = id;
+      if (isEdit) {
+        await taskService.updateTask(id, payload);
+      } else {
+        const res = await taskService.createTask(payload);
+        taskId = res.data.task._id;
+      }
+
+      // Upload new files if any
+      const newFiles = files.filter((f) => f.status === 'pending');
+      if (newFiles.length > 0) {
+        try {
+          await taskService.uploadFiles(taskId, newFiles);
+          enqueueSnackbar('Files uploaded', { variant: 'success' });
+        } catch {
+          enqueueSnackbar('Some files failed to upload', { variant: 'warning' });
+        }
+      }
+
+      enqueueSnackbar(isEdit ? 'Task updated' : 'Task created', { variant: 'success' });
+      navigate('/tasks');
+    } catch (err) {
+      enqueueSnackbar(err?.response?.data?.message || 'Failed to save task', { variant: 'error' });
+    } finally {
+      setSaving(false);
+    }
   };
 
-  if (loading && isEdit) {
-    return (
-      <Container maxWidth="md">
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <CircularProgress />
-        </Box>
-      </Container>
-    );
-  }
+  const content = (
+    <>
+      {/* Grid: Details + Schedule/Assignment */}
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 3,
+          gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' },
+          alignItems: 'stretch',
+        }}
+      >
+        {/* Details */}
+        <SectionCard id="details" title="Task Details">
+          {loading ? (
+            <Skeleton variant="rectangular" height={260} />
+          ) : (
+            <Stack spacing={2}>
+              <TextField
+                label="Title"
+                value={form.title}
+                onChange={(e) => setForm((s) => ({ ...s, title: e.target.value }))}
+                fullWidth
+                autoFocus
+              />
+              <TextField
+                label="Description"
+                value={form.description}
+                onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))}
+                fullWidth
+                multiline
+                minRows={4}
+              />
+
+              <Box
+                sx={{
+                  display: 'grid',
+                  gap: 2,
+                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                }}
+              >
+                <TextField
+                  select
+                  label="Status"
+                  value={form.status}
+                  onChange={(e) => setForm((s) => ({ ...s, status: e.target.value }))}
+                  fullWidth
+                >
+                  {STATUS_OPTS.map((o) => (
+                    <MenuItem key={o.value} value={o.value}>
+                      {o.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+
+                <TextField
+                  select
+                  label="Priority"
+                  value={form.priority}
+                  onChange={(e) => setForm((s) => ({ ...s, priority: e.target.value }))}
+                  fullWidth
+                  InputProps={{
+                    startAdornment: <Flag fontSize="small" color="action" sx={{ mr: 1 }} />,
+                  }}
+                >
+                  {PRIORITY_OPTS.map((o) => (
+                    <MenuItem key={o.value} value={o.value}>
+                      {o.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Box>
+
+              {/* Tags */}
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Tags
+                </Typography>
+                <TextField
+                  placeholder="Type a tag and press Enter"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleAddTag}
+                  fullWidth
+                  sx={{ mt: 0.5 }}
+                />
+                <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 1 }}>
+                  {tags.map((t) => (
+                    <Chip key={t} size="small" label={t} onDelete={() => handleRemoveTag(t)} sx={{ mb: 1 }} />
+                  ))}
+                </Stack>
+              </Box>
+            </Stack>
+          )}
+        </SectionCard>
+
+        {/* Schedule & Assignment */}
+        <SectionCard id="schedule" title="Schedule & Assignment">
+          {loading ? (
+            <Skeleton variant="rectangular" height={260} />
+          ) : (
+            <Stack spacing={2}>
+              <DatePicker
+                label="Due Date"
+                value={form.dueDate}
+                onChange={(v) => setForm((s) => ({ ...s, dueDate: v }))}
+                slotProps={{ textField: { fullWidth: true } }}
+              />
+              <TextField
+                select
+                label="Assigned To"
+                value={form.assignedTo}
+                onChange={(e) => setForm((s) => ({ ...s, assignedTo: e.target.value }))}
+                fullWidth
+              >
+                <MenuItem value="">Unassigned</MenuItem>
+                {users.map((u) => (
+                  <MenuItem key={u._id} value={u._id}>
+                    {u.name} ({u.email})
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                label="Estimated Hours"
+                type="number"
+                inputProps={{ min: 0, step: '0.5' }}
+                value={form.estimatedHours}
+                onChange={(e) => setForm((s) => ({ ...s, estimatedHours: e.target.value }))}
+                fullWidth
+              />
+            </Stack>
+          )}
+        </SectionCard>
+      </Box>
+
+      {/* Attachments */}
+      <Box sx={{ mt: 3 }}>
+        <SectionCard id="attachments" title="Attachments (PDF only, max 3)">
+          {loading ? (
+            <Skeleton variant="rectangular" height={160} />
+          ) : (
+            <FileUpload
+              files={[...existingFiles, ...files]}
+              onFilesChange={(newFiles) => {
+                const existing = newFiles.filter((f) => f.status === 'uploaded');
+                const pending = newFiles.filter((f) => f.status === 'pending');
+                setExistingFiles(existing);
+                setFiles(pending);
+              }}
+              maxFiles={3}
+            />
+          )}
+        </SectionCard>
+      </Box>
+
+      {/* Actions */}
+      <Stack direction="row" justifyContent="flex-end" spacing={1.5} sx={{ mt: 3 }}>
+        <Button
+          variant="outlined"
+          startIcon={<Cancel />}
+          onClick={() => navigate(isEdit ? `/tasks/${id}` : '/tasks')}
+          disabled={saving}
+          sx={{ textTransform: 'none' }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          startIcon={<Save />}
+          onClick={onSave}
+          disabled={saving}
+          sx={{ textTransform: 'none' }}
+        >
+          {isEdit ? 'Update Task' : 'Create Task'}
+        </Button>
+      </Stack>
+    </>
+  );
 
   return (
-    <Container maxWidth="md">
-      <Paper sx={{ p: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          {isEdit ? 'Edit Task' : 'Create New Task'}
+    <Container maxWidth="lg" sx={{ py: { xs: 2, md: 3 } }}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
+        <Typography variant="h4" fontWeight={700}>
+          {isEdit ? 'Edit Task' : 'Create Task'}
         </Typography>
-
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={3}>
-            {/* Title */}
-            <Grid item xs={12}>
-              <Controller
-                name="title"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Title"
-                    fullWidth
-                    error={!!errors.title}
-                    helperText={errors.title?.message}
-                    required
-                  />
-                )}
-              />
-            </Grid>
-
-            {/* Description */}
-            <Grid item xs={12}>
-              <Controller
-                name="description"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Description"
-                    fullWidth
-                    multiline
-                    rows={4}
-                    error={!!errors.description}
-                    helperText={errors.description?.message}
-                  />
-                )}
-              />
-            </Grid>
-
-            {/* Status and Priority */}
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="status"
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth error={!!errors.status}>
-                    <InputLabel>Status</InputLabel>
-                    <Select {...field} label="Status">
-                      <MenuItem value="pending">Pending</MenuItem>
-                      <MenuItem value="in_progress">In Progress</MenuItem>
-                      <MenuItem value="completed">Completed</MenuItem>
-                      <MenuItem value="cancelled">Cancelled</MenuItem>
-                    </Select>
-                    {errors.status && <FormHelperText>{errors.status.message}</FormHelperText>}
-                  </FormControl>
-                )}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="priority"
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth error={!!errors.priority}>
-                    <InputLabel>Priority</InputLabel>
-                    <Select {...field} label="Priority">
-                      <MenuItem value="low">Low</MenuItem>
-                      <MenuItem value="medium">Medium</MenuItem>
-                      <MenuItem value="high">High</MenuItem>
-                      <MenuItem value="urgent">Urgent</MenuItem>
-                    </Select>
-                    {errors.priority && <FormHelperText>{errors.priority.message}</FormHelperText>}
-                  </FormControl>
-                )}
-              />
-            </Grid>
-
-            {/* Due Date and Assigned To */}
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="dueDate"
-                control={control}
-                render={({ field }) => (
-                  <DatePicker
-                    {...field}
-                    label="Due Date"
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        error: !!errors.dueDate,
-                        helperText: errors.dueDate?.message,
-                      },
-                    }}
-                  />
-                )}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="assignedTo"
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth>
-                    <InputLabel>Assigned To</InputLabel>
-                    <Select {...field} label="Assigned To">
-                      <MenuItem value="">Unassigned</MenuItem>
-                      {users.map((user) => (
-                        <MenuItem key={user._id} value={user._id}>
-                          {user.name} ({user.email})
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                )}
-              />
-            </Grid>
-
-            {/* Estimated Hours */}
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="estimatedHours"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Estimated Hours"
-                    type="number"
-                    fullWidth
-                    error={!!errors.estimatedHours}
-                    helperText={errors.estimatedHours?.message}
-                  />
-                )}
-              />
-            </Grid>
-
-            {/* Tags */}
-            <Grid item xs={12}>
-              <TextField
-                label="Tags"
-                fullWidth
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={handleAddTag}
-                placeholder="Type and press Enter to add tags"
-                helperText="Press Enter to add tags"
-              />
-              <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {tags.map((tag) => (
-                  <Chip
-                    key={tag}
-                    label={tag}
-                    onDelete={() => handleRemoveTag(tag)}
-                    size="small"
-                  />
-                ))}
-              </Box>
-            </Grid>
-
-            {/* File Upload - Add this before Actions Grid item */}
-        <Grid item xs={12}>
-        <Typography variant="subtitle2" gutterBottom>
-            Attachments (PDF only, max 3 files)
-        </Typography>
-        <FileUpload
-            files={[...existingFiles, ...files]}
-            onFilesChange={(newFiles) => {
-            // Separate existing and new files
-            const existing = newFiles.filter(f => f.status === 'uploaded');
-            const pending = newFiles.filter(f => f.status === 'pending');
-            setExistingFiles(existing);
-            setFiles(pending);
-            }}
-            maxFiles={3}
-            disabled={loading}
-        />
-        </Grid>
-
-            {/* Actions */}
-            <Grid item xs={12}>
-              <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                <Button
-                  variant="outlined"
-                  startIcon={<Cancel />}
-                  onClick={() => navigate('/tasks')}
-                  disabled={loading}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  startIcon={<Save />}
-                  disabled={loading}
-                >
-                  {loading ? <CircularProgress size={24} /> : (isEdit ? 'Update' : 'Create')}
-                </Button>
-              </Box>
-            </Grid>
-          </Grid>
-        </form>
-      </Paper>
+        {!isEdit && (
+          <Button startIcon={<Add />} variant="outlined" onClick={() => setForm((s) => ({ ...s, title: s.title + ' ' }))} sx={{ textTransform: 'none' }}>
+            Quick Test
+          </Button>
+        )}
+      </Stack>
+      {content}
     </Container>
   );
 }
-
-export default TaskForm;

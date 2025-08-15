@@ -1,168 +1,156 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 import {
-  Container,
   Paper,
+  Typography,
   TextField,
   Button,
-  Typography,
+  Stack,
   Box,
-  Alert,
   IconButton,
   InputAdornment,
-  CircularProgress,
+  Divider,
 } from '@mui/material';
-import {
-  Visibility,
-  VisibilityOff,
-  Email,
-  Lock,
-} from '@mui/icons-material';
+import { Email, Visibility, VisibilityOff, Lock } from '@mui/icons-material';
+import { useDispatch } from 'react-redux';
 import { useSnackbar } from 'notistack';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { loginStart, loginSuccess, loginFailure } from '../../store/slices/authSlice';
 import authService from '../../services/authService';
+import { loginStart, loginSuccess, loginFailure } from '../../store/slices/authSlice';
 
-// Validation schema
 const schema = yup.object({
-  email: yup
-    .string()
-    .email('Invalid email address')
-    .required('Email is required'),
-  password: yup
-    .string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
+  email: yup.string().email('Enter a valid email').required('Email is required'),
+  password: yup.string().min(6, 'At least 6 characters').required('Password is required'),
 });
 
-function Login() {
-  const navigate = useNavigate();
+export default function Login() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
+  } = useForm({ resolver: yupResolver(schema) });
 
   const onSubmit = async (data) => {
     try {
-      setLoading(true);
+      setSubmitting(true);
       dispatch(loginStart());
-      
-      const response = await authService.login(data.email, data.password);
-      
-      dispatch(loginSuccess(response.data));
-      // Save tokens to localStorage
-localStorage.setItem('token', response.data.accessToken);
-localStorage.setItem('refreshToken', response.data.refreshToken);
-      enqueueSnackbar('Login successful!', { variant: 'success' });
+      const res = await authService.login(data.email.trim(), data.password);
+      localStorage.setItem('token', res.data.accessToken);
+      localStorage.setItem('refreshToken', res.data.refreshToken);
+      dispatch(loginSuccess(res.data));
+      enqueueSnackbar('Welcome back!', { variant: 'success' });
       navigate('/dashboard');
-    } catch (error) {
-      const message = error.response?.data?.message || 'Login failed';
-      dispatch(loginFailure(message));
-      enqueueSnackbar(message, { variant: 'error' });
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Login failed';
+      dispatch(loginFailure(msg));
+      enqueueSnackbar(msg, { variant: 'error' });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Paper elevation={3} sx={{ padding: 4, width: '100%' }}>
-          <Typography component="h1" variant="h4" align="center" gutterBottom>
-            Sign In
-          </Typography>
-          <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
-            Welcome back! Please login to your account.
-          </Typography>
-
-          <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 1 }}>
-            <TextField
-              fullWidth
-              label="Email Address"
-              margin="normal"
-              autoComplete="email"
-              autoFocus
-              {...register('email')}
-              error={!!errors.email}
-              helperText={errors.email?.message}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Email color="action" />
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <TextField
-              fullWidth
-              label="Password"
-              type={showPassword ? 'text' : 'password'}
-              margin="normal"
-              autoComplete="current-password"
-              {...register('password')}
-              error={!!errors.password}
-              helperText={errors.password?.message}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock color="action" />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              disabled={loading}
-            >
-              {loading ? <CircularProgress size={24} /> : 'Sign In'}
-            </Button>
-
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="body2">
-                Don't have an account?{' '}
-                <Link to="/register" style={{ textDecoration: 'none' }}>
-                  Sign Up
-                </Link>
-              </Typography>
-            </Box>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'grid',
+        placeItems: 'center',
+        px: 2,
+      }}
+    >
+      <Paper elevation={2} sx={{ p: { xs: 3, md: 4 }, borderRadius: 2, width: '100%', maxWidth: 480 }}>
+        <Stack spacing={2.5} alignItems="center" textAlign="center">
+          <Box>
+            <Typography variant="h4" fontWeight={700}>
+              Sign In
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Access your account to manage tasks
+            </Typography>
           </Box>
-        </Paper>
-      </Box>
-    </Container>
+
+          <Divider sx={{ width: '100%' }} />
+
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ width: '100%' }}>
+            <Stack spacing={2} alignItems="center">
+              <TextField
+                label="Email"
+                fullWidth
+                autoComplete="email"
+                autoFocus
+                {...register('email')}
+                error={!!errors.email}
+                helperText={errors.email?.message}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Email color="action" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <TextField
+                label="Password"
+                fullWidth
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                {...register('password')}
+                error={!!errors.password}
+                helperText={errors.password?.message}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock color="action" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        edge="end"
+                        onClick={() => setShowPassword((v) => !v)}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              {/* Submit button centered */}
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={submitting}
+                sx={{
+                  textTransform: 'none',
+                  width: { xs: '100%', sm: 260 },
+                }}
+              >
+                {submitting ? 'Signing in…' : 'Sign In'}
+              </Button>
+            </Stack>
+          </Box>
+
+          <Divider sx={{ width: '100%' }} />
+
+          <Typography variant="body2" color="text.secondary">
+            Don’t have an account?{' '}
+            <Link to="/register" style={{ textDecoration: 'none' }}>
+              Create one
+            </Link>
+          </Typography>
+        </Stack>
+      </Paper>
+    </Box>
   );
 }
-
-export default Login;
