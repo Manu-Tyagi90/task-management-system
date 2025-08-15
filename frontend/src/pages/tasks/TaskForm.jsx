@@ -359,23 +359,23 @@ const onSubmit = async (data) => {
             </Grid>
 
             {/* File Upload - Add this before Actions Grid item */}
-            <Grid item xs={12}>
-            <Typography variant="subtitle2" gutterBottom>
-                Attachments (PDF only, max 3 files)
-            </Typography>
-            <FileUpload
-                files={[...existingFiles, ...files]}
-                onFilesChange={(newFiles) => {
-                // Separate existing and new files
-                const existing = newFiles.filter(f => f.status === 'uploaded');
-                const pending = newFiles.filter(f => f.status === 'pending');
-                setExistingFiles(existing);
-                setFiles(pending);
-                }}
-                maxFiles={3}
-                disabled={loading}
-            />
-            </Grid>
+        <Grid item xs={12}>
+        <Typography variant="subtitle2" gutterBottom>
+            Attachments (PDF only, max 3 files)
+        </Typography>
+        <FileUpload
+            files={[...existingFiles, ...files]}
+            onFilesChange={(newFiles) => {
+            // Separate existing and new files
+            const existing = newFiles.filter(f => f.status === 'uploaded');
+            const pending = newFiles.filter(f => f.status === 'pending');
+            setExistingFiles(existing);
+            setFiles(pending);
+            }}
+            maxFiles={3}
+            disabled={loading}
+        />
+        </Grid>
 
             {/* Actions */}
             <Grid item xs={12}>

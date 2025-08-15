@@ -1,5 +1,6 @@
 # Logs
 logs
+.env.docker
 *.log
 npm-debug.log*
 yarn-debug.log*
