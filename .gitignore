@@ -3,11 +3,14 @@ node_modules/
 */node_modules/
 package-lock.json
 */package-lock.json
+.pnp
+.pnp.js
 
 # Environment variables
 .env
 .env.local
 .env.production
+.env.*.local
 */.env
 */.env.local
 
@@ -23,23 +26,61 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
 
 # OS files
 .DS_Store
 Thumbs.db
 desktop.ini
+*.swp
+*.swo
 
 # IDE
 .vscode/
 .idea/
-*.swp
-*.swo
+*.sublime-workspace
+*.sublime-project
 
 # Testing
 coverage/
 */coverage/
+.nyc_output
 
 # Temporary files
 *.tmp
 *.temp
 .cache/
+.parcel-cache/
+.next/
+.nuxt/
+.turbo/
+tmp/
+temp/
+uploads/*
+!uploads/.gitkeep
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# TypeScript
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn
+.yarn-integrity
+yarn.lock
+
+# pnpm
+pnpm-lock.yaml
