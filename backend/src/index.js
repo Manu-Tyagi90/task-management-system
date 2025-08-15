@@ -1,107 +1,91 @@
-// backend/src/index.js
-require('dotenv').config();
-
+// Main server file
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
-const cookieParser = require('cookie-parser');
+require('dotenv').config();
 
+// Import database connection
 const connectDB = require('./config/database');
-const routes = require('./routes');
-
+const cookieParser = require('cookie-parser');
+// Create Express app
 const app = express();
 
-/* Security headers */
-app.use(
-  helmet({
-    crossOriginResourcePolicy: false, // let external downloads/CDNs work
-  })
-);
-
-/* CORS — allow your Vercel app + localhost */
-const STATIC_ALLOWED_ORIGINS = [
-  process.env.FRONTEND_URL,     // e.g. https://task-management-system-frontend-gold.vercel.app
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'http://localhost:5174',
-].filter(Boolean);
-
-// Optional: temporarily allow all Vercel preview URLs during testing
-const isAllowedPreview = (origin) => origin && /\.vercel\.app$/.test(origin);
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    // Non-browser tools (no Origin header) -> allow
-    if (!origin) return callback(null, true);
-    if (STATIC_ALLOWED_ORIGINS.includes(origin) || isAllowedPreview(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error(`Not allowed by CORS: ${origin}`));
-  },
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-  // Explicitly allow common headers (browser will mirror these for preflight)
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  maxAge: 600, // cache preflight for 10 minutes
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // IMPORTANT: handle preflight (OPTIONS)
-
-/* Standard middleware */
-app.use(compression());
-app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
-app.use(express.json({ limit: '2mb' }));
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
-/* Connect DB (after middleware is fine) */
+// Connect to MongoDB
 connectDB();
 
-/* Basic route for testing */
+// Middleware
+// Middleware
+app.use(cors({
+  origin: function(origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:3000', 
+      'http://localhost:5174',
+      process.env.FRONTEND_URL, // Add your Vercel frontend URL here
+      // Add any other production URLs
+    ].filter(Boolean); // Remove undefined values
+    
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+app.use(compression()); // Compress responses
+app.use(morgan('dev')); // Logging
+app.use(express.json()); // Parse JSON bodies
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(cookieParser());
+
+// Basic route for testing
 app.get('/', (req, res) => {
-  res.json({
+  res.json({ 
     message: '🚀 Task Management API is running!',
     version: '1.0.0',
-    timestamp: new Date().toISOString(),
+    timestamp: new Date().toISOString()
   });
 });
 
-/* Health check */
+// Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({
+  res.status(200).json({ 
     status: 'OK',
     message: 'Server is healthy',
-    uptime: process.uptime(),
+    uptime: process.uptime()
   });
 });
 
-/* API Routes */
+// API Routes
 app.use('/api', require('./routes'));
 
-/* Error handler */
+// Error handling middleware
 app.use((err, req, res, next) => {
-  if (err && /Not allowed by CORS/i.test(err.message)) {
-    return res.status(403).json({ success: false, message: err.message });
-  }
-  console.error('Error:', err.stack || err.message);
+  console.error('Error:', err.stack);
   res.status(err.status || 500).json({
     message: err.message || 'Something went wrong!',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 });
 
-/* 404 */
+// 404 handler
 app.use((req, res) => {
-  res.status(404).json({
+  res.status(404).json({ 
     message: 'Route not found',
-    path: req.originalUrl,
+    path: req.originalUrl 
   });
 });
 
-/* Start server */
+// Start server
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
   console.log('\n========================================');
@@ -112,7 +96,7 @@ const server = app.listen(PORT, () => {
   console.log('========================================\n');
 });
 
-/* Graceful shutdown */
+// Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('SIGTERM signal received: closing HTTP server');
   server.close(() => {
