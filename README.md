@@ -7,6 +7,17 @@
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black)](https://vercel.com)
 [![Deployed on Render](https://img.shields.io/badge/Deployed%20on-Render-blue)](https://render.com)
 
+
+## Screenshots
+
+<p align="center"> <img src="https://github.com/user-attachments/assets/7425751a-f3f8-47bb-b3c1-d9420630dabd" height="300" width="auto" /> <img src="https://github.com/user-attachments/assets/d83dc5a7-cfa2-4881-a48f-e808df66ee33" height="300" width="auto" /> <img src="https://github.com/user-attachments/assets/f1965cfd-8173-4853-b68e-5264a76c89b6" height="300" width="auto" /> </p>
+
+<p align="center"> <img src="https://github.com/user-attachments/assets/804271e2-64c7-415a-b889-dca4b6dd730d" height="300" width="auto" /> <img src="https://github.com/user-attachments/assets/64b0c7f8-0869-4da9-90ed-c82d3fd483ec" height="300" width="auto" /> <img src="https://github.com/user-attachments/assets/86cca5ca-ac2a-49f4-9ef1-1707d85c668d" height="300" width="auto" /> </p>
+
+<p align="center"> <img src="https://github.com/user-attachments/assets/f394daa4-bdd2-442f-9646-4b35e3e9a6f8" height="300" width="auto" /> <img src="https://github.com/user-attachments/assets/1359dfdd-d78d-4879-a2e1-c1a6b340c0b7" height="300" width="auto" /> <img src="https://github.com/user-attachments/assets/8fe8ad2d-d399-4045-98ca-7cc73dc60b82" height="300" width="auto" /> </p>
+
+## Context
+
 A production‑ready, full‑stack task management system with authentication (JWT), role‑based authorization, CRUD for users and tasks, file uploads to Cloudinary (PDFs), analytics dashboard, responsive UI (aligned, justified cards), Swagger API docs, Docker, and CI/CD‑friendly workflow.
 
 This README is intentionally comprehensive. Use the table of contents to jump where you need.
