@@ -8,7 +8,7 @@ require('dotenv').config();
 
 // Import database connection
 const connectDB = require('./config/database');
-
+const cookieParser = require('cookie-parser');
 // Create Express app
 const app = express();
 
@@ -25,6 +25,7 @@ app.use(compression()); // Compress responses
 app.use(morgan('dev')); // Logging
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(cookieParser());
 
 // Basic route for testing
 app.get('/', (req, res) => {
