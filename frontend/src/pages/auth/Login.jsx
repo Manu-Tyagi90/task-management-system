@@ -61,6 +61,9 @@ function Login() {
       const response = await authService.login(data.email, data.password);
       
       dispatch(loginSuccess(response.data));
+      // Save tokens to localStorage
+localStorage.setItem('token', response.data.accessToken);
+localStorage.setItem('refreshToken', response.data.refreshToken);
       enqueueSnackbar('Login successful!', { variant: 'success' });
       navigate('/dashboard');
     } catch (error) {
