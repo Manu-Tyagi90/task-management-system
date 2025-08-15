@@ -18,9 +18,10 @@ connectDB();
 // Middleware
 app.use(helmet()); // Security headers
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5174'],
   credentials: true
 }));
+
 app.use(compression()); // Compress responses
 app.use(morgan('dev')); // Logging
 app.use(express.json()); // Parse JSON bodies
