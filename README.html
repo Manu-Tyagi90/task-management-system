@@ -1,0 +1,598 @@
+<!DOCTYPE html><html><head>
+      <title>README</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="file:///c:\Users\DELL\.vscode\extensions\shd101wyy.markdown-preview-enhanced-0.8.18\crossnote\dependencies\katex\katex.min.css">
+      
+      
+      <script type="text/javascript" src="file:///c:\Users\DELL\.vscode\extensions\shd101wyy.markdown-preview-enhanced-0.8.18\crossnote\dependencies\mermaid\mermaid.min.js" charset="UTF-8"></script>
+      
+      
+      <style>
+      code[class*=language-],pre[class*=language-]{color:#333;background:0 0;font-family:Consolas,"Liberation Mono",Menlo,Courier,monospace;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.4;-moz-tab-size:8;-o-tab-size:8;tab-size:8;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:.8em;overflow:auto;border-radius:3px;background:#f5f5f5}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal;background:#f5f5f5}.token.blockquote,.token.comment{color:#969896}.token.cdata{color:#183691}.token.doctype,.token.macro.property,.token.punctuation,.token.variable{color:#333}.token.builtin,.token.important,.token.keyword,.token.operator,.token.rule{color:#a71d5d}.token.attr-value,.token.regex,.token.string,.token.url{color:#183691}.token.atrule,.token.boolean,.token.code,.token.command,.token.constant,.token.entity,.token.number,.token.property,.token.symbol{color:#0086b3}.token.prolog,.token.selector,.token.tag{color:#63a35c}.token.attr-name,.token.class,.token.class-name,.token.function,.token.id,.token.namespace,.token.pseudo-class,.token.pseudo-element,.token.url-reference .token.variable{color:#795da3}.token.entity{cursor:help}.token.title,.token.title .token.punctuation{font-weight:700;color:#1d3e81}.token.list{color:#ed6a43}.token.inserted{background-color:#eaffea;color:#55a532}.token.deleted{background-color:#ffecec;color:#bd2c00}.token.bold{font-weight:700}.token.italic{font-style:italic}.language-json .token.property{color:#183691}.language-markup .token.tag .token.punctuation{color:#333}.language-css .token.function,code.language-css{color:#0086b3}.language-yaml .token.atrule{color:#63a35c}code.language-yaml{color:#183691}.language-ruby .token.function{color:#333}.language-markdown .token.url{color:#795da3}.language-makefile .token.symbol{color:#795da3}.language-makefile .token.variable{color:#183691}.language-makefile .token.builtin{color:#0086b3}.language-bash .token.keyword{color:#0086b3}pre[data-line]{position:relative;padding:1em 0 1em 3em}pre[data-line] .line-highlight-wrapper{position:absolute;top:0;left:0;background-color:transparent;display:block;width:100%}pre[data-line] .line-highlight{position:absolute;left:0;right:0;padding:inherit 0;margin-top:1em;background:hsla(24,20%,50%,.08);background:linear-gradient(to right,hsla(24,20%,50%,.1) 70%,hsla(24,20%,50%,0));pointer-events:none;line-height:inherit;white-space:pre}pre[data-line] .line-highlight:before,pre[data-line] .line-highlight[data-end]:after{content:attr(data-start);position:absolute;top:.4em;left:.6em;min-width:1em;padding:0 .5em;background-color:hsla(24,20%,50%,.4);color:#f4f1ef;font:bold 65%/1.5 sans-serif;text-align:center;vertical-align:.3em;border-radius:999px;text-shadow:none;box-shadow:0 1px #fff}pre[data-line] .line-highlight[data-end]:after{content:attr(data-end);top:auto;bottom:.4em}html body{font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ol,html body>ul{margin-bottom:16px}html body ol,html body ul{padding-left:2em}html body ol.no-list,html body ul.no-list{padding:0;list-style-type:none}html body ol ol,html body ol ul,html body ul ol,html body ul ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;background-color:#f0f0f0;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:700;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:700}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::after,html body code::before{letter-spacing:-.2em;content:'\00a0'}html body pre>code{padding:0;margin:0;word-break:normal;white-space:pre;background:0 0;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:after,html body pre code:before,html body pre tt:after,html body pre tt:before{content:normal}html body blockquote,html body dl,html body ol,html body p,html body pre,html body ul{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body code,html body pre{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview ul{list-style:disc}.markdown-preview ul ul{list-style:circle}.markdown-preview ul ul ul{list-style:square}.markdown-preview ol{list-style:decimal}.markdown-preview ol ol,.markdown-preview ul ol{list-style-type:lower-roman}.markdown-preview ol ol ol,.markdown-preview ol ul ol,.markdown-preview ul ol ol,.markdown-preview ul ul ol{list-style-type:lower-alpha}.markdown-preview .newpage,.markdown-preview .pagebreak{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center!important}.markdown-preview:not([data-for=preview]) .code-chunk .code-chunk-btn-group{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .status{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .output-div{margin-bottom:16px}.markdown-preview .md-toc{padding:0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link div,.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}.markdown-preview .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0;min-height:100vh}@media screen and (min-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{font-size:14px!important;padding:1em}}@media print{html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc{padding:0 16px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link div,html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% - 300px);padding:2em calc(50% - 457px - 300px / 2);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+      </style>
+      <!-- The content below will be included at the end of the <head> element. --><script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    // your code here
+  });
+</script></head><body for="html-export">
+    
+    
+      <div class="crossnote markdown-preview  ">
+      
+<h1 id="task-management-system-express--react--mongodb--cloudinary">Task Management System (Express + React + MongoDB + Cloudinary) </h1>
+<p>A production‑ready, full‑stack task management system with authentication (JWT), role‑based authorization, CRUD for users and tasks, file uploads to Cloudinary (PDFs), analytics dashboard, responsive UI (aligned, justified cards), Swagger API docs, Docker, and CI/CD‑friendly workflow.</p>
+<p>This README is intentionally comprehensive. Use the table of contents to jump where you need.</p>
+<hr>
+<h2 id="table-of-contents">Table of Contents </h2>
+<ul>
+<li><a href="#live-links">Live Links</a></li>
+<li><a href="#screens--features">Screens &amp; Features</a></li>
+<li><a href="#tech-stack">Tech Stack</a></li>
+<li>
+<ul>
+<li><a href="#high-level-system-diagram">High-Level System Diagram</a></li>
+<li><a href="#runtime-sequence-login--task-crud">Runtime Sequence (Login → Task CRUD)</a></li>
+<li><a href="#cicd-flow">CI/CD Flow</a></li>
+</ul>
+</li>
+<li><a href="#monorepo-structure">Monorepo Structure</a></li>
+<li><a href="#environment-variables">Environment Variables</a>
+<ul>
+<li><a href="#backend-env">Backend .env</a></li>
+<li><a href="#frontend-env">Frontend .env</a></li>
+<li><a href="#docker-envdocker">Docker .env.docker</a></li>
+</ul>
+</li>
+<li>
+<h2><a href="#installation--local-development">Installation &amp; Local Development</a></h2>
+<ul>
+<li><a href="#clone--bootstrap">Clone &amp; Bootstrap</a></li>
+<li><a href="#run-backend-dev">Run Backend (Dev)</a></li>
+<li><a href="#run-frontend-dev">Run Frontend (Dev)</a></li>
+</ul>
+</li>
+<li><a href="#database-mongodb-atlas">Database (MongoDB Atlas)</a></li>
+<li><a href="#file-storage-cloudinary">File Storage (Cloudinary)</a></li>
+<li><a href="#cors--production-origins">CORS &amp; Production Origins</a></li>
+<li><a href="#api-documentation-swagger">API Documentation (Swagger)</a></li>
+<li>
+<ul>
+<li><a href="#backend-jest--supertest">Backend (Jest + Supertest)</a></li>
+<li><a href="#frontend-vitest--react-testing-library">Frontend (Vitest + React Testing Library)</a></li>
+<li><a href="#end-to-end-playwright">End-to-End (Playwright)</a></li>
+</ul>
+</li>
+<li><a href="#docker--docker-compose">Docker &amp; Docker Compose</a></li>
+<li>
+<ul>
+<li><a href="#backend-on-render">Backend on Render</a></li>
+<li><a href="#frontend-on-vercel">Frontend on Vercel</a></li>
+<li><a href="#post-deployment-checklist">Post-Deployment Checklist</a></li>
+</ul>
+</li>
+<li><a href="#common-issues--fixes">Common Issues &amp; Fixes</a></li>
+<li><a href="#security-notes">Security Notes</a></li>
+<li><a href="#performance-tips">Performance Tips</a></li>
+<li></li>
+<li></li>
+</ul>
+<hr>
+<h2 id="live-links">Live Links </h2>
+<ul>
+<li>
+<p>Frontend (Vercel):<br>
+<a href="https://task-management-system-frontend-gold.vercel.app">https://task-management-system-frontend-gold.vercel.app</a></p>
+</li>
+<li>
+<p>Backend (Render):<br>
+<a href="https://task-management-system-517n.onrender.com">https://task-management-system-517n.onrender.com</a></p>
+</li>
+<li>
+<p>Health Check:<br>
+<a href="https://task-management-system-517n.onrender.com/health">https://task-management-system-517n.onrender.com/health</a></p>
+</li>
+</ul>
+<p>Note: If you redeploy to your own domains, update the links above and the environment variables accordingly.</p>
+<hr>
+<h2 id="screens--features">Screens &amp; Features </h2>
+<ul>
+<li>Auth: Register, Login, JWT access/refresh tokens, logout, protected routes</li>
+<li>Role-based authorization: admin vs user</li>
+<li>Tasks: Create, Read, Update, Delete
+<ul>
+<li>Assign to users, set status, priority, due date, tags, estimated hours</li>
+<li>Comments on tasks (add/edit/delete)</li>
+<li>Attach up to 3 PDFs; download and delete attachments</li>
+</ul>
+</li>
+<li>Users (Admin):
+<ul>
+<li>List users with search, filters, pagination</li>
+<li>Update role/status; delete users</li>
+</ul>
+</li>
+<li>Dashboard:
+<ul>
+<li>Stats (total, completed, in‑progress, overdue)</li>
+<li>Priority distribution</li>
+<li>Quick actions</li>
+<li>Recent activity placeholder</li>
+</ul>
+</li>
+<li>Profile:
+<ul>
+<li>Overview with compact label:value rows</li>
+<li>Edit name/email</li>
+<li>Change password</li>
+</ul>
+</li>
+<li>Settings:
+<ul>
+<li>Theme toggle (dark/light)</li>
+<li>Notification mock toggles</li>
+<li>Account info</li>
+</ul>
+</li>
+<li>UI:
+<ul>
+<li>Responsive, justified cards (SectionCard pattern)</li>
+<li>Aligned forms and layouts across pages</li>
+</ul>
+</li>
+<li>Swagger docs &amp; OpenAPI JSON</li>
+</ul>
+<hr>
+<h2 id="tech-stack">Tech Stack </h2>
+<ul>
+<li>Frontend: React 18, Vite, Material‑UI (MUI), Redux Toolkit, React Router</li>
+<li>Backend: Node.js, Express, Mongoose (MongoDB)</li>
+<li>Auth: JWT (access + refresh)</li>
+<li>Storage: Cloudinary (resource_type: raw for PDFs)</li>
+<li>Database: MongoDB Atlas</li>
+<li>Docs: Swagger (swagger-ui-express + swagger-jsdoc)</li>
+<li>Testing: Jest + Supertest (backend), Vitest + React Testing Library (frontend), Playwright (E2E)</li>
+<li>DevOps: Docker, Docker Compose, Render (backend), Vercel (frontend)</li>
+</ul>
+<hr>
+<h2 id="architecture">Architecture </h2>
+<h3 id="high-level-system-diagram">High-Level System Diagram </h3>
+<div class="mermaid">flowchart LR
+  subgraph Client["Client (Browser)"]
+    UI[React + MUI]
+  end
+
+  subgraph Frontend["Vercel: Frontend App"]
+    Vite[Vite Bundle]
+  end
+
+  subgraph Backend["Render: Express API"]
+    API[Express Routes]
+    Auth[JWT Auth &amp; RBAC]
+    Uploads[Cloudinary Upload Adapter]
+    Swagger[Swagger /api-docs]
+  end
+
+  subgraph External["External Services"]
+    DB[(MongoDB Atlas)]
+    CDN[Cloudinary]
+  end
+
+  UI --&gt;|HTTPS| Frontend
+  Frontend --&gt;|HTTPS| Backend
+  Backend --&gt;|TLS| DB
+  Backend --&gt;|HTTPS| CDN
+</div><h3 id="runtime-sequence-login--task-crud">Runtime Sequence (Login → Task CRUD) </h3>
+<div class="mermaid">sequenceDiagram
+  participant U as User
+  participant FE as Frontend (Vercel)
+  participant BE as Backend (Render)
+  participant DB as MongoDB Atlas
+  participant CL as Cloudinary
+
+  U-&gt;&gt;FE: Open login page
+  U-&gt;&gt;FE: Submit credentials
+  FE-&gt;&gt;BE: POST /api/auth/login (email, password)
+  BE-&gt;&gt;DB: Verify user &amp; hash
+  DB--&gt;&gt;BE: User OK
+  BE--&gt;&gt;FE: 200 { user, accessToken, refreshToken }
+
+  U-&gt;&gt;FE: Create Task (title, desc, etc.)
+  FE-&gt;&gt;BE: POST /api/tasks (Bearer token)
+  BE-&gt;&gt;DB: Insert Task
+  DB--&gt;&gt;BE: Saved task
+  BE--&gt;&gt;FE: 201 { task }
+
+  U-&gt;&gt;FE: Upload PDFs
+  FE-&gt;&gt;BE: POST /api/tasks/:id/upload (form-data)
+  BE-&gt;&gt;CL: Upload file(s) (resource_type: raw)
+  CL--&gt;&gt;BE: secure_url, public_id
+  BE-&gt;&gt;DB: Update task.attachments
+  DB--&gt;&gt;BE: OK
+  BE--&gt;&gt;FE: 200 { task with attachments }
+</div><h3 id="cicd-flow">CI/CD Flow </h3>
+<div class="mermaid">flowchart LR
+  Dev[Dev Machine] --&gt;|git push| GitHub
+  GitHub --&gt;|Render Auto Deploy| Render[Backend]
+  GitHub --&gt;|Vercel Auto Deploy| Vercel[Frontend]
+  Render --&gt;|pull env| RenderEnv[Render Env Vars]
+  Vercel --&gt;|pull env| VercelEnv[Vercel Env Vars]
+</div><hr>
+<h2 id="monorepo-structure">Monorepo Structure </h2>
+<pre data-role="codeBlock" data-info="text" class="language-text text"><code>task-management-system/
+├── backend/
+│   ├── src/
+│   │   ├── config/         # database.js, cloudinary.js, swagger.js
+│   │   ├── controllers/    # auth.controller.js, task.controller.js, user.controller.js
+│   │   ├── middleware/     # auth.middleware.js, validation.middleware.js
+│   │   ├── models/         # User.js, Task.js
+│   │   ├── routes/         # index.js, auth.routes.js, task.routes.js, user.routes.js
+│   │   └── index.js        # Express server
+│   ├── package.json
+│   └── .env.example
+├── frontend/
+│   ├── src/
+│   │   ├── components/     # SectionCard, FileUpload, etc.
+│   │   ├── pages/          # auth, dashboard, tasks, users, profile, settings
+│   │   ├── services/       # api.js, taskService.js, userService.js, authService.js
+│   │   ├── store/          # Redux slices
+│   │   └── App.jsx, main.jsx
+│   ├── package.json
+│   └── .env.example
+├── docker-compose.yml
+├── render.yaml (optional)
+├── package.json             # npm workspaces
+└── README.md
+</code></pre><hr>
+<h2 id="environment-variables">Environment Variables </h2>
+<h3 id="backend-env">Backend <code>.env</code> </h3>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>NODE_ENV=development
+PORT=5000
+
+# MongoDB Atlas
+MONGODB_URI=mongodb+srv://&lt;user&gt;:&lt;password&gt;@&lt;cluster&gt;.mongodb.net/taskdb?retryWrites=true&amp;w=majority
+
+# JWT
+JWT_SECRET=&lt;long-random-string&gt;
+JWT_REFRESH_SECRET=&lt;long-random-string&gt;
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=&lt;cloud_name&gt;
+CLOUDINARY_API_KEY=&lt;api_key&gt;
+CLOUDINARY_API_SECRET=&lt;api_secret&gt;
+
+# CORS allowed frontend origin
+FRONTEND_URL=http://localhost:5173
+
+# (Optional) Swagger server url
+API_BASE_URL=http://localhost:5000
+</code></pre><h3 id="frontend-env">Frontend <code>.env</code> </h3>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>VITE_API_URL=http://localhost:5000/api
+# Optional if you have websockets:
+# VITE_WS_URL=ws://localhost:5000/ws
+</code></pre><h3 id="docker-envdocker">Docker <code>.env.docker</code> </h3>
+<pre data-role="codeBlock" data-info="" class="language-text"><code># Mongo (if using local docker mongo)
+MONGO_INITDB_ROOT_USERNAME=admin
+MONGO_INITDB_ROOT_PASSWORD=password123
+MONGO_INITDB_DATABASE=taskdb
+
+# Backend
+NODE_ENV=production
+PORT=5000
+JWT_SECRET=&lt;prod-jwt&gt;
+JWT_REFRESH_SECRET=&lt;prod-refresh&gt;
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=&lt;cloud_name&gt;
+CLOUDINARY_API_KEY=&lt;api_key&gt;
+CLOUDINARY_API_SECRET=&lt;api_secret&gt;
+
+# Frontend URL (docker dev)
+FRONTEND_URL=http://localhost:3000
+
+# Frontend build API
+VITE_API_URL=http://localhost:5000/api
+</code></pre><hr>
+<h2 id="installation--local-development">Installation &amp; Local Development </h2>
+<h3 id="prerequisites">Prerequisites </h3>
+<ul>
+<li>Node.js 18+ (you have 22, good)</li>
+<li>npm 9+ (you have 11, good)</li>
+<li>Git</li>
+<li>Optional: Docker Desktop (for Docker setup)</li>
+</ul>
+<h3 id="clone--bootstrap">Clone &amp; Bootstrap </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">git</span> clone https://github.com/<span class="token operator">&lt;</span>your-username<span class="token operator">&gt;</span>/task-management-system.git
+<span class="token builtin class-name">cd</span> task-management-system
+
+<span class="token comment"># install workspace deps</span>
+<span class="token function">npm</span> <span class="token function">install</span>
+</code></pre><p>Create env files:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token comment"># Backend env</span>
+<span class="token function">cp</span> backend/.env.example backend/.env
+<span class="token comment"># edit backend/.env with your Atlas + Cloudinary credentials</span>
+
+<span class="token comment"># Frontend env</span>
+<span class="token function">cp</span> frontend/.env.example frontend/.env
+<span class="token comment"># edit frontend/.env if needed</span>
+</code></pre><h3 id="run-backend-dev">Run Backend (Dev) </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">npm</span> run dev:backend
+<span class="token comment"># server at http://localhost:5000</span>
+<span class="token comment"># health: http://localhost:5000/health</span>
+</code></pre><h3 id="run-frontend-dev">Run Frontend (Dev) </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">npm</span> run dev:frontend
+<span class="token comment"># Vite dev server at http://localhost:5173</span>
+</code></pre><p>Open <a href="http://localhost:5173">http://localhost:5173</a> and test register/login.</p>
+<hr>
+<h2 id="database-mongodb-atlas">Database (MongoDB Atlas) </h2>
+<ol>
+<li>Create cluster (FREE tier) at <a href="https://cloud.mongodb.com">https://cloud.mongodb.com</a></li>
+<li>Create DB user (readWRITE, strong password)</li>
+<li>Network Access: allow 0.0.0.0/0 (for quick start; restrict later)</li>
+<li>Connection string: use SRV, include <code>taskdb</code> database name</li>
+<li>Set <code>MONGODB_URI</code> in backend <code>.env</code> and in Render env</li>
+</ol>
+<hr>
+<h2 id="file-storage-cloudinary">File Storage (Cloudinary) </h2>
+<ol>
+<li>Create account at <a href="https://cloudinary.com">https://cloudinary.com</a></li>
+<li>Note credentials (Cloud name, API key, secret)</li>
+<li>In backend <code>.env</code> set:
+<ul>
+<li><code>CLOUDINARY_CLOUD_NAME</code>, <code>CLOUDINARY_API_KEY</code>, <code>CLOUDINARY_API_SECRET</code></li>
+</ul>
+</li>
+<li>Uploads use <code>resource_type: 'raw'</code> for PDFs; metadata saved in Mongo.</li>
+</ol>
+<hr>
+<h2 id="cors--production-origins">CORS &amp; Production Origins </h2>
+<ul>
+<li>Backend must allow your frontend origin:
+<ul>
+<li>In backend <code>index.js</code> CORS setup, whitelisted: <code>FRONTEND_URL</code></li>
+<li>On Render (backend) set <code>FRONTEND_URL=https://&lt;your-frontend&gt;.vercel.app</code></li>
+</ul>
+</li>
+<li>Frontend must point to backend API:
+<ul>
+<li>On Vercel (frontend) set <code>VITE_API_URL=https://&lt;your-backend&gt;.onrender.com/api</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="testing">Testing </h2>
+<h3 id="backend-jest--supertest">Backend (Jest + Supertest) </h3>
+<p>Install (already present in many setups):</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token comment"># if missing</span>
+<span class="token function">npm</span> i <span class="token parameter variable">-D</span> jest supertest cross-env <span class="token parameter variable">--workspace</span><span class="token operator">=</span>backend
+</code></pre><p>Example test script in <code>backend/package.json</code>:</p>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token property">"scripts"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+  <span class="token property">"test"</span><span class="token operator">:</span> <span class="token string">"cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --coverage"</span>
+<span class="token punctuation">}</span>
+</code></pre><p>Basic sample: <code>backend/src/__tests__/auth.test.js</code></p>
+<pre data-role="codeBlock" data-info="js" class="language-javascript js"><code><span class="token keyword keyword-const">const</span> request <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'supertest'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword keyword-const">const</span> app <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'../index'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// export app in index.js for test or create a separate app export</span>
+
+<span class="token function">describe</span><span class="token punctuation">(</span><span class="token string">'Auth'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span>
+  <span class="token function">it</span><span class="token punctuation">(</span><span class="token string">'should fail register with missing fields'</span><span class="token punctuation">,</span> <span class="token keyword keyword-async">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword keyword-const">const</span> res <span class="token operator">=</span> <span class="token keyword control-flow keyword-await">await</span> <span class="token function">request</span><span class="token punctuation">(</span>app<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token method function property-access">post</span><span class="token punctuation">(</span><span class="token string">'/api/auth/register'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token method function property-access">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">expect</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">400</span><span class="token punctuation">,</span> <span class="token number">422</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token method function property-access">toContain</span><span class="token punctuation">(</span>res<span class="token punctuation">.</span><span class="token property-access">statusCode</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre><p>Run:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">npm</span> run <span class="token builtin class-name">test</span> <span class="token parameter variable">--workspace</span><span class="token operator">=</span>backend
+</code></pre><h3 id="frontend-vitest--react-testing-library">Frontend (Vitest + React Testing Library) </h3>
+<p>Scripts in <code>frontend/package.json</code>:</p>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token property">"scripts"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+  <span class="token property">"test"</span><span class="token operator">:</span> <span class="token string">"vitest --environment jsdom --coverage"</span><span class="token punctuation">,</span>
+  <span class="token property">"test:ui"</span><span class="token operator">:</span> <span class="token string">"vitest --ui"</span>
+<span class="token punctuation">}</span>
+</code></pre><p>Example test: <code>frontend/src/__tests__/App.test.jsx</code></p>
+<pre data-role="codeBlock" data-info="jsx" class="language-jsx jsx"><code><span class="token keyword module keyword-import">import</span> <span class="token imports"><span class="token punctuation">{</span> render<span class="token punctuation">,</span> screen <span class="token punctuation">}</span></span> <span class="token keyword module keyword-from">from</span> <span class="token string">'@testing-library/react'</span><span class="token punctuation">;</span>
+<span class="token keyword module keyword-import">import</span> <span class="token imports"><span class="token maybe-class-name">App</span></span> <span class="token keyword module keyword-from">from</span> <span class="token string">'../App'</span><span class="token punctuation">;</span>
+<span class="token keyword module keyword-import">import</span> <span class="token imports"><span class="token punctuation">{</span> <span class="token maybe-class-name">Provider</span> <span class="token punctuation">}</span></span> <span class="token keyword module keyword-from">from</span> <span class="token string">'react-redux'</span><span class="token punctuation">;</span>
+<span class="token keyword module keyword-import">import</span> <span class="token imports"><span class="token punctuation">{</span> store <span class="token punctuation">}</span></span> <span class="token keyword module keyword-from">from</span> <span class="token string">'../store'</span><span class="token punctuation">;</span>
+<span class="token keyword module keyword-import">import</span> <span class="token imports"><span class="token punctuation">{</span> <span class="token maybe-class-name">BrowserRouter</span> <span class="token punctuation">}</span></span> <span class="token keyword module keyword-from">from</span> <span class="token string">'react-router-dom'</span><span class="token punctuation">;</span>
+
+<span class="token function">test</span><span class="token punctuation">(</span><span class="token string">'renders login title'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=&gt;</span> <span class="token punctuation">{</span>
+  <span class="token function">render</span><span class="token punctuation">(</span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">Provider</span></span> <span class="token attr-name">store</span><span class="token script language-javascript"><span class="token script-punctuation punctuation">=</span><span class="token punctuation">{</span>store<span class="token punctuation">}</span></span><span class="token punctuation">&gt;</span></span><span class="token plain-text">
+      </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">BrowserRouter</span></span><span class="token punctuation">&gt;</span></span><span class="token plain-text">
+        </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token class-name">App</span></span> <span class="token punctuation">/&gt;</span></span><span class="token plain-text">
+      </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token class-name">BrowserRouter</span></span><span class="token punctuation">&gt;</span></span><span class="token plain-text">
+    </span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token class-name">Provider</span></span><span class="token punctuation">&gt;</span></span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">expect</span><span class="token punctuation">(</span>screen<span class="token punctuation">.</span><span class="token method function property-access">getByText</span><span class="token punctuation">(</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">Sign In</span><span class="token regex-delimiter">/</span><span class="token regex-flags">i</span></span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token method function property-access">toBeInTheDocument</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre><p>Run:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">npm</span> run <span class="token builtin class-name">test</span> <span class="token parameter variable">--workspace</span><span class="token operator">=</span>frontend
+</code></pre><h3 id="end-to-end-playwright">End-to-End (Playwright) </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token comment"># if missing</span>
+<span class="token function">npm</span> i <span class="token parameter variable">-D</span> @playwright/test <span class="token parameter variable">--workspace</span><span class="token operator">=</span>frontend
+npx playwright <span class="token function">install</span>
+</code></pre><p><code>frontend/playwright.config.ts</code>:</p>
+<pre data-role="codeBlock" data-info="ts" class="language-ts ts"><code><span class="token keyword keyword-import">import</span> <span class="token punctuation">{</span> defineConfig<span class="token punctuation">,</span> devices <span class="token punctuation">}</span> <span class="token keyword keyword-from">from</span> <span class="token string">'@playwright/test'</span><span class="token punctuation">;</span>
+<span class="token keyword keyword-export">export</span> <span class="token keyword keyword-default">default</span> <span class="token function">defineConfig</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  testDir<span class="token operator">:</span> <span class="token string">'./e2e'</span><span class="token punctuation">,</span>
+  use<span class="token operator">:</span> <span class="token punctuation">{</span> baseURL<span class="token operator">:</span> <span class="token string">'http://localhost:5173'</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  projects<span class="token operator">:</span> <span class="token punctuation">[</span> <span class="token punctuation">{</span> name<span class="token operator">:</span> <span class="token string">'chromium'</span><span class="token punctuation">,</span> use<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token operator">...</span>devices<span class="token punctuation">[</span><span class="token string">'Desktop Chrome'</span><span class="token punctuation">]</span> <span class="token punctuation">}</span> <span class="token punctuation">}</span> <span class="token punctuation">]</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre><p>Simple E2E: <code>frontend/e2e/auth.spec.ts</code>:</p>
+<pre data-role="codeBlock" data-info="ts" class="language-ts ts"><code><span class="token keyword keyword-import">import</span> <span class="token punctuation">{</span> test<span class="token punctuation">,</span> expect <span class="token punctuation">}</span> <span class="token keyword keyword-from">from</span> <span class="token string">'@playwright/test'</span><span class="token punctuation">;</span>
+
+<span class="token function">test</span><span class="token punctuation">(</span><span class="token string">'login page renders'</span><span class="token punctuation">,</span> <span class="token keyword keyword-async">async</span> <span class="token punctuation">(</span><span class="token punctuation">{</span> page <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  <span class="token keyword keyword-await">await</span> page<span class="token punctuation">.</span><span class="token function">goto</span><span class="token punctuation">(</span><span class="token string">'/login'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword keyword-await">await</span> <span class="token function">expect</span><span class="token punctuation">(</span>page<span class="token punctuation">.</span><span class="token function">getByRole</span><span class="token punctuation">(</span><span class="token string">'heading'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> name<span class="token operator">:</span> <span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">sign in</span><span class="token regex-delimiter">/</span><span class="token regex-flags">i</span></span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toBeVisible</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre><p>Run:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">npm</span> run dev:frontend  <span class="token comment"># start Vite</span>
+<span class="token comment"># In another terminal:</span>
+npx playwright <span class="token builtin class-name">test</span> <span class="token parameter variable">--workspace</span><span class="token operator">=</span>frontend
+</code></pre><hr>
+<h2 id="docker--docker-compose">Docker &amp; Docker Compose </h2>
+<p>Build and run (dev-ish stack):</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">docker-compose</span> up <span class="token parameter variable">--build</span>
+<span class="token comment"># Frontend at http://localhost:3000</span>
+<span class="token comment"># Backend at http://localhost:5000</span>
+</code></pre><p>If using Atlas in docker, update <code>docker-compose.yml</code> backend <code>MONGODB_URI</code> to Atlas string and comment out local mongo service.</p>
+<hr>
+<h2 id="deployment">Deployment </h2>
+<h3 id="backend-on-render">Backend on Render </h3>
+<ul>
+<li>New Web Service → connect GitHub</li>
+<li>Root Directory: <code>backend</code></li>
+<li>Build: <code>npm install</code></li>
+<li>Start: <code>npm start</code></li>
+<li>Health Check: <code>/health</code></li>
+<li>Env Vars:
+<ul>
+<li><code>NODE_ENV=production</code></li>
+<li><code>PORT=5000</code></li>
+<li><code>MONGODB_URI=&lt;atlas-uri-with-taskdb&gt;</code></li>
+<li><code>JWT_SECRET</code>, <code>JWT_REFRESH_SECRET</code></li>
+<li><code>CLOUDINARY_*</code></li>
+<li><code>FRONTEND_URL=https://&lt;your-frontend&gt;.vercel.app</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="frontend-on-vercel">Frontend on Vercel </h3>
+<ul>
+<li>New Project → import repo</li>
+<li>Root Directory: <code>frontend</code></li>
+<li>Build: <code>npm run build</code></li>
+<li>Output: <code>dist</code></li>
+<li>Env Vars:
+<ul>
+<li><code>VITE_API_URL=https://&lt;your-backend&gt;.onrender.com/api</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="post-deployment-checklist">Post-Deployment Checklist </h3>
+<ul>
+<li>Backend <code>/health</code> returns 200</li>
+<li>Frontend can register/login</li>
+<li>Tasks list loads; CRUD works</li>
+<li>File upload/download works</li>
+<li>No CORS errors (if yes, check <code>FRONTEND_URL</code> and <code>VITE_API_URL</code>)</li>
+</ul>
+<hr>
+<h2 id="common-issues--fixes">Common Issues &amp; Fixes </h2>
+<ul>
+<li>
+<p>CORS error from Vercel → Render</p>
+<ul>
+<li>Backend <code>FRONTEND_URL</code> must equal your Vercel domain (no trailing slash)</li>
+<li>Backend must handle preflight: <code>app.options('*', cors(corsOptions))</code></li>
+<li>Frontend must target <code>VITE_API_URL=https://&lt;backend&gt;/api</code></li>
+</ul>
+</li>
+<li>
+<p>path-to-regexp “Missing parameter name”</p>
+<ul>
+<li>You accidentally used a full URL in a route path:
+<ul>
+<li>Wrong: <code>app.use('https://your-frontend.vercel.app', ...)</code></li>
+<li>Right: <code>app.use('/api', ...)</code></li>
+</ul>
+</li>
+<li>Search for lines with <code>app.use(</code> or <code>router.use(</code> that include <code>http(s)://</code> and fix.</li>
+</ul>
+</li>
+<li>
+<p>Cloudinary “Customer is untrusted”</p>
+<ul>
+<li>Verify email; add billing if Cloudinary prompts for trust</li>
+<li>Credentials must match dashboard</li>
+</ul>
+</li>
+<li>
+<p>MongoDB “Authentication failed”</p>
+<ul>
+<li>MONGODB_URI user/pass wrong or contains special chars not URL‑encoded</li>
+<li>Atlas Network Access not open to Render (0.0.0.0/0 temporarily)</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="security-notes">Security Notes </h2>
+<ul>
+<li>Never commit real <code>.env</code> files; use <code>.env.example</code> templates</li>
+<li>Use long, random <code>JWT_SECRET</code> and <code>JWT_REFRESH_SECRET</code></li>
+<li>Limit allowed origin(s) in CORS</li>
+<li>Consider rate limits on <code>/api/auth/*</code></li>
+<li>Validate inputs with <code>express-validator</code> (already used)</li>
+<li>Sanitize filenames and enforce <code>application/pdf</code> for uploads</li>
+</ul>
+<hr>
+<h2 id="performance-tips">Performance Tips </h2>
+<ul>
+<li>Use <code>compression()</code> (enabled)</li>
+<li>Keep indexes on Mongo fields used in filters (<code>status</code>, <code>priority</code>, <code>assignedTo</code>, etc.)</li>
+<li>Cache non‑sensitive GETs if needed</li>
+<li>Avoid large PDF uploads (limit to 5 MB and max 3 files)</li>
+</ul>
+<hr>
+<h2 id="roadmap">Roadmap </h2>
+<ul>
+<li>WebSockets for real-time updates (task status, comments)</li>
+<li>Email notifications (task assignment, due reminders)</li>
+<li>Invite links and password reset flows</li>
+<li>Better analytics (charts, trends)</li>
+<li>Granular permissions (managers, viewers)</li>
+<li>i18n (multi-language)</li>
+</ul>
+<hr>
+<h2 id="license">License </h2>
+<p>MIT © 2025 Manu Tyagi</p>
+
+      </div>
+      
+      
+    
+    
+    <script type="module">
+// TODO: If ZenUML gets integrated into mermaid in the future,
+//      we can remove the following lines.
+
+
+var MERMAID_CONFIG = ({"startOnLoad":false});
+if (typeof MERMAID_CONFIG !== 'undefined') {
+  MERMAID_CONFIG.startOnLoad = false
+  MERMAID_CONFIG.cloneCssStyles = false
+  MERMAID_CONFIG.theme = "default"
+}
+
+mermaid.initialize(MERMAID_CONFIG || {})
+if (typeof(window['Reveal']) !== 'undefined') {
+  function mermaidRevealHelper(event) {
+    var currentSlide = event.currentSlide
+    var diagrams = currentSlide.querySelectorAll('.mermaid')
+    for (var i = 0; i < diagrams.length; i++) {
+      var diagram = diagrams[i]
+      if (!diagram.hasAttribute('data-processed')) {
+        mermaid.init(null, diagram, ()=> {
+          Reveal.slide(event.indexh, event.indexv)
+        })
+      }
+    }
+  }
+  Reveal.addEventListener('slidetransitionend', mermaidRevealHelper)
+  Reveal.addEventListener('ready', mermaidRevealHelper)
+  await mermaid.run({
+    nodes: document.querySelectorAll('.mermaid')
+  })
+} else {
+  await mermaid.run({
+    nodes: document.querySelectorAll('.mermaid')
+  })
+}
+</script>
+    
+    
+    
+  
+    </body></html>
